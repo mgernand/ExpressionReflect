@@ -46,6 +46,7 @@
     <Compile Include="ExpressionVisitor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReflectionOutputExpressionVisitor.cs" />
+    <Compile Include="TypeExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\ExpressionReflect.snk">

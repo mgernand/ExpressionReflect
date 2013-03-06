@@ -6,11 +6,13 @@
 	using System.Linq;
 	using System.Linq.Expressions;
 	using System.Reflection;
+	using System.Runtime.CompilerServices;
 
 	internal sealed class ReflectionOutputExpressionVisitor : ExpressionVisitor
 	{
 		private readonly IDictionary<string, object> args;
-		private readonly Stack<object> result = new Stack<object>();
+		private readonly Stack<object> evaluatedData = new Stack<object>();
+		private readonly Stack<string> localVariableNames = new Stack<string>(); 
 
 		internal ReflectionOutputExpressionVisitor(IDictionary<string, object> args)
 		{
@@ -21,12 +23,12 @@
 		{
 			this.Visit(expression);
 
-			if (this.result.Count != 1)
+			if (this.evaluatedData.Count != 1)
 			{
 				throw new ArgumentException("The result stack contained too much elements.");
 			}
 
-			return this.result.Pop();
+			return this.evaluatedData.Pop();
 		}
 
 		protected override Expression VisitMemberAccess(MemberExpression m)
@@ -39,9 +41,16 @@
 
 				ParameterExpression parameter = (ParameterExpression)m.Expression;
 				object value = propertyInfo.GetValue(this.GetInvocationTarget(parameter), null);
-				this.result.Push(value);
+				this.evaluatedData.Push(value);
 			}
-			// Todo: Fields
+			if(memberInfo is FieldInfo)
+			{
+				bool isCompilerGenerated = memberInfo.DeclaringType.IsCompilerGenerated();
+				if (isCompilerGenerated) // Special case for local variables
+				{
+					localVariableNames.Push(memberInfo.Name);
+				}
+			}
 
 			return base.VisitMemberAccess(m);
 		}
@@ -55,7 +64,7 @@
 		
 			ParameterExpression parameter = (ParameterExpression)m.Object;
 			object value = methodInfo.Invoke(this.GetInvocationTarget(parameter), parameterValues);
-			this.result.Push(value);
+			this.evaluatedData.Push(value);
 			
 			return methodCallExpression;
 		}
@@ -68,7 +77,7 @@
 			object[] parameterValues = this.GetValuesFromStack(nex.Arguments);
 
 			object value = constructorInfo.Invoke(parameterValues.ToArray());
-			this.result.Push(value);
+			this.evaluatedData.Push(value);
 
 			return newExpression;
 		}
@@ -119,14 +128,29 @@
 					throw new ArgumentOutOfRangeException();
 			}
 
-			this.result.Push(value);
+			this.evaluatedData.Push(value);
 			
 			return binaryExpression;
 		}
 
 		protected override Expression VisitConstant(ConstantExpression c)
 		{
-			this.result.Push(c.Value);
+			object value = null;
+
+			bool isCompilerGenerated = c.Type.IsCompilerGenerated();
+			if(isCompilerGenerated) // Special case for local variables
+			{
+				string memberName = this.localVariableNames.Pop();
+				MemberInfo memberInfo = c.Type.GetMember(memberName).First();
+				FieldInfo fieldInfo = (FieldInfo)memberInfo;
+				value = fieldInfo.GetValue(c.Value);
+			}
+			else
+			{
+				value = c.Value;
+			}
+
+			this.evaluatedData.Push(value);
 
 			return base.VisitConstant(c);
 		}
@@ -139,7 +163,7 @@
 			for (int i = 0; i < expressions.Count(); i++)
 			{
 				Expression expression = expressions[i];		
-				object parameterValue = this.result.Pop();
+				object parameterValue = this.evaluatedData.Pop();
 				parameterValue = Convert.ChangeType(parameterValue, expression.Type, CultureInfo.InvariantCulture);
 				parameterValues.Add(parameterValue);
 			}
@@ -153,7 +177,7 @@
 
 			for (int i = 0; i < count; i++)
 			{
-				object parameterValue = this.result.Pop();
+				object parameterValue = this.evaluatedData.Pop();
 				parameterValues.Add(parameterValue);
 			}
 

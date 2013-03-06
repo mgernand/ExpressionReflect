@@ -59,9 +59,15 @@ x => x.CalculateLength(x.Firstname);
 x => x.Calculate(x.Age + x.Value);
 ```
 
-* Simple method call with return value, expression parameters, binary expression and constant expression (+, -, *, /, %)
+* Simple method call with return value, expression parameters, binary expression and constant (+, -, *, /, %)
 ```csharp
 x => x.Calculate(x.Age + 100);
+```
+
+* Simple method call with return value, expression parameters, binary expression and local variable (+, -, *, /, %)
+```csharp
+int value = 666;
+x => x.Calculate(value);
 ```
 
 * Simple constructor call
@@ -79,8 +85,13 @@ x => new Customer(x.Lastname, x.Firstname);
 x => new Customer(x.Age + x.Value);
 ```
 
-* Simple constructor call with expression parameters, binary expression and constant expression (+, -, *, /, %)
+* Simple constructor call with expression parameters, binary expression and constant (+, -, *, /, %)
 ```csharp
 x => new Customer(x.Age + 100);
 ```
 
+* Simple constructor call with expression parameters, binary expression and local variable (+, -, *, /, %)
+```csharp
+int value = 666;
+x => new Customer(value);
+```

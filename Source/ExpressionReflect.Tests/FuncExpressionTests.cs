@@ -121,6 +121,28 @@ namespace ExpressionReflect.Tests
 			reflectionResult.Should().Be(emitResult);
 		}
 
+		[Test]
+		public void ShouldCreateSimpleFunc_MethodCall_WithExpressionParameters_BinaryExpression_LocalVariable()
+		{
+			// Arrange
+			Customer customer = new Customer("John", "Doe");
+			int value = 666;
+			Expression<Func<Customer, int>> expression = x => x.Calculate(value);
+			Console.WriteLine(expression.ToString());
+
+			// Act
+			Func<Customer, int> emit = expression.Compile();
+			Func<Customer, int> reflection = expression.Reflect();
+
+			int emitResult = emit.Invoke(customer);
+			int reflectionResult = reflection.Invoke(customer);
+
+			// Assert
+			emitResult.Should().Be(699);
+			reflectionResult.Should().Be(699);
+			reflectionResult.Should().Be(emitResult);
+		}
+
 		#endregion
 
 		#region Constructor
@@ -208,6 +230,28 @@ namespace ExpressionReflect.Tests
 			// Assert
 			emitResult.CalculationValue.Should().Be(133);
 			reflectionResult.CalculationValue.Should().Be(133);
+			reflectionResult.CalculationValue.Should().Be(emitResult.CalculationValue);
+		}
+
+		[Test]
+		public void ShouldCreateSimpleFunc_New_WithExpressionParameters_BinaryExpression_LocalVariable()
+		{
+			// Arrange
+			Customer customer = new Customer("John", "Doe");
+			int value = 666;
+			Expression<Func<Customer, Customer>> expression = x => new Customer(value);
+			Console.WriteLine(expression.ToString());
+
+			// Act
+			Func<Customer, Customer> emit = expression.Compile();
+			Func<Customer, Customer> reflection = expression.Reflect();
+
+			Customer emitResult = emit.Invoke(customer);
+			Customer reflectionResult = reflection.Invoke(customer);
+
+			// Assert
+			emitResult.CalculationValue.Should().Be(666);
+			reflectionResult.CalculationValue.Should().Be(666);
 			reflectionResult.CalculationValue.Should().Be(emitResult.CalculationValue);
 		}
 
