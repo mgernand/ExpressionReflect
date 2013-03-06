@@ -49,14 +49,19 @@ x => x.Firstname
 x => x.CalculateAge()
 ```
 
-* Simple method call with return value and with expression parameters
+* Simple method call with return value and expression parameters
 ```csharp
 x => x.CalculateLength(x.Firstname);
 ```
 
-* Simple method call with return value and with expression parameters and binary expression (+, -, *, /, %)
+* Simple method call with return value, expression parameters and binary expression (+, -, *, /, %)
 ```csharp
 x => x.Calculate(x.Age + x.Value);
+```
+
+* Simple method call with return value, expression parameters, binary expression and constant expression (+, -, *, /, %)
+```csharp
+x => x.Calculate(x.Age + 100);
 ```
 
 * Simple constructor call
@@ -73,3 +78,9 @@ x => new Customer(x.Lastname, x.Firstname);
 ```csharp
 x => new Customer(x.Age + x.Value);
 ```
+
+* Simple constructor call with expression parameters, binary expression and constant expression (+, -, *, /, %)
+```csharp
+x => new Customer(x.Age + 100);
+```
+

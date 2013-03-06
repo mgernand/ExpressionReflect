@@ -2,7 +2,6 @@
 {
 	using System;
 	using System.Collections.Generic;
-	using System.Collections.ObjectModel;
 	using System.Globalization;
 	using System.Linq;
 	using System.Linq.Expressions;
@@ -12,7 +11,6 @@
 	{
 		private readonly IDictionary<string, object> args;
 		private readonly Stack<object> result = new Stack<object>();
-		private readonly Stack<Type> conversionStack = new Stack<Type>(); 
 
 		internal ReflectionOutputExpressionVisitor(IDictionary<string, object> args)
 		{
@@ -80,26 +78,24 @@
 			Expression binaryExpression = base.VisitBinary(b);
 
 			object[] values = this.GetValuesFromStack(2);
-			double left = Convert.ToDouble(values.First());
-			double right = Convert.ToDouble(values.Last());
-			double value;
+			object value;
 
 			switch (b.NodeType)
 			{
 				case ExpressionType.Add:
-					value = left + right;
+					value = Convert.ToDouble(values.First()) + Convert.ToDouble(values.Last());
 					break;	
 				case ExpressionType.Subtract:
-					value = left - right;
+					value = Convert.ToDouble(values.First()) - Convert.ToDouble(values.Last());
 					break;
 				case ExpressionType.Multiply:
-					value = left * right;
+					value = Convert.ToDouble(values.First()) * Convert.ToDouble(values.Last());
 					break;
 				case ExpressionType.Divide:
-					value = left / right;
+					value = Convert.ToDouble(values.First()) / Convert.ToDouble(values.Last());
 					break;
 				case ExpressionType.Modulo:
-					value = left % right;
+					value = Convert.ToDouble(values.First()) % Convert.ToDouble(values.Last());
 					break;
 				//case ExpressionType.AddChecked:
 				//case ExpressionType.SubtractChecked:
@@ -126,6 +122,13 @@
 			this.result.Push(value);
 			
 			return binaryExpression;
+		}
+
+		protected override Expression VisitConstant(ConstantExpression c)
+		{
+			this.result.Push(c.Value);
+
+			return base.VisitConstant(c);
 		}
 
 		private object[] GetValuesFromStack(IEnumerable<Expression> arguments)
