@@ -70,6 +70,29 @@ int value = 666;
 x => x.Calculate(value);
 ```
 
+* Simple method call with return value, expression parameters and nested constructor call.
+```csharp
+int value = 666;
+x => x.Calculate(new Customer(value));
+```
+
+* Simple method call with return value, expression parameters and nested method call.
+```csharp
+x.Calculate(x.CalculateAge());
+```
+
+* Simple method call with return value, expression parameters and local delegate call.
+```csharp
+Func<int> method = () => 100;
+x => x.Calculate(method());
+```
+
+* Simple method call with return value, expression parameters and local delegate call with parameters.
+```csharp
+Func<int, int> method = x => x + 100;
+x => x.Calculate(method(10));
+```
+
 * Simple constructor call
 ```csharp
 x => new Customer();
@@ -95,3 +118,38 @@ x => new Customer(x.Age + 100);
 int value = 666;
 x => new Customer(value);
 ```
+
+* Simple constructor call with expression parameters and nested costructor call
+```csharp
+int value = 666;
+x => new Customer(new Customer(value));
+```
+
+* Simple constructor call with expression parameters and nested method call.
+```csharp
+x => new Customer(x.CalculateAge());
+```
+
+* Simple constructor call with expression parameters and local delegate call.
+```csharp
+Func<int> method = () => 100;
+x => new Customer(method());
+```
+
+* Simple constructor call with expression parameters and local delegate call with parameters.
+```csharp
+Func<int, int> method = x => x + 100;
+x => new Customer(method(10));
+```
+
+Supported features
+------------------
+
+* `Func<T, TResult>`
+* Method calls
+* Constructor invocations
+* Local variables
+* Constant expressions
+* Local delegates
+* Local delegates with parameters (local and constant, binary expression)
+* Binary expressions (+, -, *, /, %)

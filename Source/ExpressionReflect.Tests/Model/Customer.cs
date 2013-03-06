@@ -22,6 +22,13 @@
 			this.Lastname = lastname;
 		}
 
+		public Customer(Customer toCopy)
+		{
+			this.calculationValue = toCopy.CalculationValue;
+			this.Firstname = toCopy.Firstname;
+			this.Lastname = toCopy.Lastname;
+		}
+
 		public string Firstname { get; set; }
 		public string Lastname { get; set; }
 		public int Age 
@@ -52,6 +59,11 @@
 		public int Calculate(int increment)
 		{
 			return this.CalculateAge() + increment;
+		}
+
+		public int Calculate(Customer customer)
+		{
+			return this.CalculateAge() + customer.CalculationValue;
 		}
 
 		public override string ToString()

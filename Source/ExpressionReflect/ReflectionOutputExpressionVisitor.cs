@@ -6,7 +6,6 @@
 	using System.Linq;
 	using System.Linq.Expressions;
 	using System.Reflection;
-	using System.Runtime.CompilerServices;
 
 	internal sealed class ReflectionOutputExpressionVisitor : ExpressionVisitor
 	{
@@ -142,8 +141,17 @@
 			{
 				string memberName = this.localVariableNames.Pop();
 				MemberInfo memberInfo = c.Type.GetMember(memberName).First();
+
 				FieldInfo fieldInfo = (FieldInfo)memberInfo;
 				value = fieldInfo.GetValue(c.Value);
+
+				if(value is Delegate)
+				{
+					Delegate del = (Delegate)value;
+					ParameterInfo[] parameterInfos = del.Method.GetParameters();
+					object[] parameterValues = GetValuesFromStack(parameterInfos.Length);
+					value = del.DynamicInvoke(parameterValues);
+				}
 			}
 			else
 			{
