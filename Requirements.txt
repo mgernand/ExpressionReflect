@@ -1,0 +1,2 @@
+- NuGet must be installed
+- MSBuild.exe must be in PATH

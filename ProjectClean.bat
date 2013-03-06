@@ -1,0 +1,1 @@
+msbuild Build\Build.proj /target:Clean

@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata>
+		<id>ExpressionReflect</id>
+		<version>0.0.0</version>
+		<authors>Matthias Gernand</authors>
+		<owners>Matthias Gernand</owners>
+		<licenseUrl></licenseUrl>
+		<projectUrl>https://github.com/mgernand/ExpressionReflect</projectUrl>
+		<!--<iconUrl></iconUrl>-->
+		<requireLicenseAcceptance>false</requireLicenseAcceptance>
+		<description>Provides the ability to "compile" expressions to delegates without using Reflection.Emit but only using reflection.</description>
+		<summary></summary>
+		<language>en-US</language>
+		<tags>expressions reflection compile monotouch xamarin ios</tags>
+		<dependencies>
+			<!-- Add nuget package dependencies -->
+		</dependencies>
+		<frameworkAssemblies>
+			<!-- Add framework assemblies -->
+		</frameworkAssemblies>
+	</metadata>
+	<files>
+		<!-- Add nuget package files -->
+		<!-- Todo: Portable -->
+		<file src="ExpressionReflect.dll" target="lib\net45\ExpressionReflect.dll" />
+		<file src="ExpressionReflect.xml" target="lib\net45\ExpressionReflect.xml" />
+		<file src="ExpressionReflect.pdb" target="lib\net45\ExpressionReflect.pdb" />
+	</files>
+</package>
