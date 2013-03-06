@@ -6,7 +6,7 @@
 
 	public static class ExpressionExtensions
 	{
-		public static Func<T, TResult> CompileExpression<T, TResult>(this Expression<Func<T, TResult>> expression)
+		public static Func<T, TResult> Reflect<T, TResult>(this Expression<Func<T, TResult>> expression)
 		{
 			// Note: Remember to always give the parameter values to CreateArgs(...) in the correct order.
 			Func<T, TResult> func = x => (TResult)ExecuteExpression(expression, CreateArgs(expression.Parameters, x));

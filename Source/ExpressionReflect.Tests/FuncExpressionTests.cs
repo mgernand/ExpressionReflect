@@ -19,7 +19,7 @@
 
 			// Act
 			Func<Customer, string> emit = expression.Compile();
-			Func<Customer, string> reflection = expression.CompileExpression();
+			Func<Customer, string> reflection = expression.Reflect();
 
 			string emitResult = emit.Invoke(customer);
 			string reflectionResult = reflection.Invoke(customer);
@@ -40,7 +40,7 @@
 
 			// Act
 			Func<Customer, int> emit = expression.Compile();
-			Func<Customer, int> reflection = expression.CompileExpression();
+			Func<Customer, int> reflection = expression.Reflect();
 
 			int emitResult = emit.Invoke(customer);
 			int reflectionResult = reflection.Invoke(customer);
