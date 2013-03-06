@@ -22,11 +22,11 @@ Usage
 
 The usage is fairly simple. It's just an extension method on a generic expression:
 
-	```C#
-	Expression<Func<Customer, string>> expression = x => x.Firstname;
-	Func<Customer, string> reflection = expression.Reflect();
-	string result = reflection.Invoke(customer);
-	```
+```csharp
+Expression<Func<Customer, string>> expression = x => x.Firstname;
+Func<Customer, string> reflection = expression.Reflect();
+string result = reflection.Invoke(customer);
+```
 
 Reflect() will return a delegate that will invoke the reflection evaluation internally.
 
@@ -35,15 +35,16 @@ What is supported?
 
 The following built-in delegates are supported at the moment:
 
-* Func<T, TResult>
+* `Func<T, TResult>`
 
 The following expression types are supported at the moment:
 
 * Property getter
-	```C#
-	x => x.Firstname
-	```
+```csharp
+x => x.Firstname
+```
+
 * Simple method call with return value
-	```C#
-	x => x.CalculateAge()
-	```
+```csharp
+x => x.CalculateAge()
+```
