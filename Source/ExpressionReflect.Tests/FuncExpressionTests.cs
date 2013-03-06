@@ -1,4 +1,5 @@
-﻿namespace ExpressionReflect.Tests
+﻿// ReSharper disable InconsistentNaming
+namespace ExpressionReflect.Tests
 {
 	using System;
 	using System.Linq.Expressions;
@@ -10,7 +11,7 @@
 	public class FuncExpressionTests
 	{
 		[Test]
-		public void ShouldCreateSimpleFuncProperty()
+		public void ShouldCreateSimpleFunc_PropertyGetter()
 		{
 			// Arrange
 			Customer customer = new Customer("John", "Doe");
@@ -30,8 +31,11 @@
 			reflectionResult.Should().Be(emitResult);
 		}
 
+		#region Method
+
+
 		[Test]
-		public void ShouldCreateSimpleFuncMethod()
+		public void ShouldCreateSimpleFunc_MethodCall()
 		{
 			// Arrange
 			Customer customer = new Customer("John", "Doe");
@@ -46,9 +50,123 @@
 			int reflectionResult = reflection.Invoke(customer);
 
 			// Assert
-			emitResult.Should().Be(Customer.Age);
-			reflectionResult.Should().Be(Customer.Age);
+			emitResult.Should().Be(Customer.AgeConstant);
+			reflectionResult.Should().Be(Customer.AgeConstant);
 			reflectionResult.Should().Be(emitResult);
 		}
+
+		[Test]
+		public void ShouldCreateSimpleFunc_MethodCall_WithExpressionParameters()
+		{
+			// Arrange
+			Customer customer = new Customer("John", "Doe");
+			Expression<Func<Customer, int>> expression = x => x.CalculateLength(x.Firstname);
+			Console.WriteLine(expression.ToString());
+
+			// Act
+			Func<Customer, int> emit = expression.Compile();
+			Func<Customer, int> reflection = expression.Reflect();
+
+			int emitResult = emit.Invoke(customer);
+			int reflectionResult = reflection.Invoke(customer);
+
+			// Assert
+			emitResult.Should().Be(4);
+			reflectionResult.Should().Be(4);
+			reflectionResult.Should().Be(emitResult);
+		}
+
+		[Test]
+		public void ShouldCreateSimpleFunc_MethodCall_WithExpressionParameters_BinaryExpression()
+		{
+			// Arrange
+			Customer customer = new Customer("John", "Doe");
+			Expression<Func<Customer, int>> expression = x => x.Calculate(x.Age + x.Value);
+			Console.WriteLine(expression.ToString());
+
+			// Act
+			Func<Customer, int> emit = expression.Compile();
+			Func<Customer, int> reflection = expression.Reflect();
+
+			int emitResult = emit.Invoke(customer);
+			int reflectionResult = reflection.Invoke(customer);
+
+			// Assert
+			emitResult.Should().Be(76);
+			reflectionResult.Should().Be(76);
+			reflectionResult.Should().Be(emitResult);
+		}
+
+		#endregion
+
+		#region Constructor
+
+		[Test]
+		public void ShouldCreateSimpleFunc_New_WithoutParameters()
+		{
+			// Arrange
+			Customer customer = new Customer("John", "Doe");
+			Expression<Func<Customer, Customer>> expression = x => new Customer();
+			Console.WriteLine(expression.ToString());
+
+			// Act
+			Func<Customer, Customer> emit = expression.Compile();
+			Func<Customer, Customer> reflection = expression.Reflect();
+
+			Customer emitResult = emit.Invoke(customer);
+			Customer reflectionResult = reflection.Invoke(customer);
+
+			// Assert
+			emitResult.Should().NotBeNull();
+			reflectionResult.Should().NotBeNull();
+		}
+
+		[Test]
+		public void ShouldCreateSimpleFunc_New_WithExpressionParameters()
+		{
+			// Arrange
+			Customer customer = new Customer("John", "Doe");
+			Expression<Func<Customer, Customer>> expression = x => new Customer(x.Lastname, x.Firstname);
+			Console.WriteLine(expression.ToString());
+
+			// Act
+			Func<Customer, Customer> emit = expression.Compile();
+			Func<Customer, Customer> reflection = expression.Reflect();
+
+			Customer emitResult = emit.Invoke(customer);
+			Customer reflectionResult = reflection.Invoke(customer);
+
+			// Assert
+			emitResult.Should().NotBeNull();
+			reflectionResult.Should().NotBeNull();
+			reflectionResult.Firstname.Should().Be(emitResult.Firstname);
+			reflectionResult.Lastname.Should().Be(emitResult.Lastname);
+			reflectionResult.Firstname.Should().Be("Doe");
+			reflectionResult.Lastname.Should().Be("John");
+		}
+
+		[Test]
+		public void ShouldCreateSimpleFunc_New_WithExpressionParameters_BinaryExpression()
+		{
+			// Arrange
+			Customer customer = new Customer("John", "Doe");
+			Expression<Func<Customer, Customer>> expression = x => new Customer(x.Age + x.Value);
+			Console.WriteLine(expression.ToString());
+
+			// Act
+			Func<Customer, Customer> emit = expression.Compile();
+			Func<Customer, Customer> reflection = expression.Reflect();
+
+			Customer emitResult = emit.Invoke(customer);
+			Customer reflectionResult = reflection.Invoke(customer);
+
+			// Assert
+			emitResult.CalculationValue.Should().Be(43);
+			reflectionResult.CalculationValue.Should().Be(43);
+			reflectionResult.CalculationValue.Should().Be(emitResult.CalculationValue);
+		}
+
+		#endregion
 	}
 }
+// ReSharper restore InconsistentNaming

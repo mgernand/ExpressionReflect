@@ -39,7 +39,7 @@ The following built-in delegates are supported at the moment:
 
 The following expression types are supported at the moment:
 
-* Property getter
+* Simple property getter
 ```csharp
 x => x.Firstname
 ```
@@ -47,4 +47,29 @@ x => x.Firstname
 * Simple method call with return value
 ```csharp
 x => x.CalculateAge()
+```
+
+* Simple method call with return value and with expression parameters
+```csharp
+x => x.CalculateLength(x.Firstname);
+```
+
+* Simple method call with return value and with expression parameters and binary expression (+, -, *, /, %)
+```csharp
+x => x.Calculate(x.Age + x.Value);
+```
+
+* Simple constructor call
+```csharp
+x => new Customer();
+```
+
+* Simple constructor call with expression parameters
+```csharp
+x => new Customer(x.Lastname, x.Firstname);
+```
+
+* Simple constructor call with expression parameters and binary expression (+, -, *, /, %)
+```csharp
+x => new Customer(x.Age + x.Value);
 ```
