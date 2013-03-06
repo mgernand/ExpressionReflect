@@ -18,7 +18,7 @@
 			this.args = args;
 		}
 
-		internal object GetResult(Expression expression)
+		internal object GetResult(Expression expression, Type returnType)
 		{
 			this.Visit(expression);
 
@@ -27,7 +27,8 @@
 				throw new ArgumentException("The result stack contained too much elements.");
 			}
 
-			return this.evaluatedData.Pop();
+			object value = this.GetValueFromStack(returnType);
+			return value;
 		}
 
 		protected override Expression VisitMemberAccess(MemberExpression m)
@@ -88,6 +89,7 @@
 			object[] values = this.GetValuesFromStack(2);
 			object value;
 
+			// Todo: What if some implemented the operators on their custom class?
 			switch (b.NodeType)
 			{
 				case ExpressionType.Add:
@@ -105,24 +107,52 @@
 				case ExpressionType.Modulo:
 					value = Convert.ToDouble(values.First()) % Convert.ToDouble(values.Last());
 					break;
+				case ExpressionType.Equal:
+					value = values.First() == values.Last();
+					break;
+				case ExpressionType.NotEqual:
+					value = values.First() != values.Last();
+					break;
+				case ExpressionType.And:
+					value = Convert.ToBoolean(values.First()) & Convert.ToBoolean(values.Last());
+					break;
+				case ExpressionType.AndAlso:
+					value = Convert.ToBoolean(values.First()) && Convert.ToBoolean(values.Last());
+					break;
+				case ExpressionType.Or:
+					value = Convert.ToBoolean(values.First()) | Convert.ToBoolean(values.Last());
+					break;
+				case ExpressionType.OrElse:
+					value = Convert.ToBoolean(values.First()) || Convert.ToBoolean(values.Last());
+					break;
+				case ExpressionType.ExclusiveOr:
+					value = Convert.ToBoolean(values.First()) ^ Convert.ToBoolean(values.Last());
+					break;
+				case ExpressionType.LessThan:
+					value = Convert.ToDouble(values.First()) < Convert.ToDouble(values.Last());
+					break;
+				case ExpressionType.LessThanOrEqual:
+					value = Convert.ToDouble(values.First()) <= Convert.ToDouble(values.Last());
+					break;
+				case ExpressionType.GreaterThan:
+					value = Convert.ToDouble(values.First()) > Convert.ToDouble(values.Last());
+					break;
+				case ExpressionType.GreaterThanOrEqual:
+					value = Convert.ToDouble(values.First()) >= Convert.ToDouble(values.Last());
+					break;
+				case ExpressionType.RightShift:
+					value = Convert.ToInt64(values.First()) >> Convert.ToInt32(values.Last());
+					break;
+				case ExpressionType.LeftShift:
+					value = Convert.ToInt64(values.First()) << Convert.ToInt32(values.Last());
+					break;
+				case ExpressionType.Coalesce:
+					value = values.First() ?? values.Last();
+					break;
 				//case ExpressionType.AddChecked:
 				//case ExpressionType.SubtractChecked:
 				//case ExpressionType.MultiplyChecked:					
-				//case ExpressionType.And:
-				//case ExpressionType.AndAlso:
-				//case ExpressionType.Or:
-				//case ExpressionType.OrElse:
-				//case ExpressionType.LessThan:
-				//case ExpressionType.LessThanOrEqual:
-				//case ExpressionType.GreaterThan:
-				//case ExpressionType.GreaterThanOrEqual:
-				//case ExpressionType.Equal:
-				//case ExpressionType.NotEqual:
-				//case ExpressionType.Coalesce:
-				//case ExpressionType.ArrayIndex:
-				//case ExpressionType.RightShift:
-				//case ExpressionType.LeftShift:
-				//case ExpressionType.ExclusiveOr:
+				//case ExpressionType.ArrayIndex:	
 				default:
 					throw new ArgumentOutOfRangeException();
 			}
@@ -130,6 +160,43 @@
 			this.evaluatedData.Push(value);
 			
 			return binaryExpression;
+		}
+
+		protected override Expression VisitUnary(UnaryExpression u)
+		{
+			Expression unaryExpression = base.VisitUnary(u);
+
+			object[] values = this.GetValuesFromStack(1);
+			object value;
+
+			switch (u.NodeType)
+			{
+				case ExpressionType.Negate:
+					value = -Convert.ToDouble(values.First());
+					break;
+				case ExpressionType.Not:
+					if(values.First() is bool)
+					{
+						value = !Convert.ToBoolean(values.First());
+					}
+					else
+					{
+						value = ~Convert.ToInt64(values.First());
+					}				
+					break;
+				//case ExpressionType.NegateChecked:
+				//case ExpressionType.Quote:
+				//case ExpressionType.Convert:
+				//case ExpressionType.ConvertChecked:
+				//case ExpressionType.ArrayLength:
+				//case ExpressionType.TypeAs:
+				default:
+					throw new ArgumentOutOfRangeException();
+			}
+
+			this.evaluatedData.Push(value);
+
+			return unaryExpression;
 		}
 
 		protected override Expression VisitConstant(ConstantExpression c)
@@ -170,9 +237,8 @@
 			Expression[] expressions = arguments.ToArray();
 			for (int i = 0; i < expressions.Count(); i++)
 			{
-				Expression expression = expressions[i];		
-				object parameterValue = this.evaluatedData.Pop();
-				parameterValue = Convert.ChangeType(parameterValue, expression.Type, CultureInfo.InvariantCulture);
+				Expression expression = expressions[i];
+				object parameterValue = this.GetValueFromStack(expression.Type);
 				parameterValues.Add(parameterValue);
 			}
 
@@ -190,6 +256,13 @@
 			}
 
 			return parameterValues.Reverse().ToArray();
+		}
+
+		private object GetValueFromStack(Type conversionType)
+		{
+			object parameterValue = this.evaluatedData.Pop();
+			parameterValue = Convert.ChangeType(parameterValue, conversionType, CultureInfo.InvariantCulture);
+			return parameterValue;
 		}
 
 		private object GetInvocationTarget(ParameterExpression parameter)

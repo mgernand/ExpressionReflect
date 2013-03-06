@@ -54,17 +54,17 @@ x => x.CalculateAge()
 x => x.CalculateLength(x.Firstname);
 ```
 
-* Simple method call with return value, expression parameters and binary expression (+, -, *, /, %)
+* Simple method call with return value, expression parameters and binary expression
 ```csharp
 x => x.Calculate(x.Age + x.Value);
 ```
 
-* Simple method call with return value, expression parameters, binary expression and constant (+, -, *, /, %)
+* Simple method call with return value, expression parameters, binary expression and constant
 ```csharp
 x => x.Calculate(x.Age + 100);
 ```
 
-* Simple method call with return value, expression parameters, binary expression and local variable (+, -, *, /, %)
+* Simple method call with return value, expression parameters, binary expression and local variable
 ```csharp
 int value = 666;
 x => x.Calculate(value);
@@ -103,17 +103,17 @@ x => new Customer();
 x => new Customer(x.Lastname, x.Firstname);
 ```
 
-* Simple constructor call with expression parameters and binary expression (+, -, *, /, %)
+* Simple constructor call with expression parameters and binary expression
 ```csharp
 x => new Customer(x.Age + x.Value);
 ```
 
-* Simple constructor call with expression parameters, binary expression and constant (+, -, *, /, %)
+* Simple constructor call with expression parameters, binary expression and constant
 ```csharp
 x => new Customer(x.Age + 100);
 ```
 
-* Simple constructor call with expression parameters, binary expression and local variable (+, -, *, /, %)
+* Simple constructor call with expression parameters, binary expression and local variable 
 ```csharp
 int value = 666;
 x => new Customer(value);
@@ -152,4 +152,5 @@ Supported features
 * Constant expressions
 * Local delegates
 * Local delegates with parameters (local and constant, binary expression)
-* Binary expressions (+, -, *, /, %)
+* Binary expressions (most)
+* Unary expressions (most)
