@@ -21,6 +21,11 @@
 			this.args = args;
 		}
 
+		/// <summary>
+		/// The entry point for the evaluation.
+		/// </summary>
+		/// <param name="expression">The expression to evaludate.</param>
+		/// <returns>The result of the expression.</returns>
 		internal object GetResult(Expression expression)
 		{
 			this.Visit(expression);
