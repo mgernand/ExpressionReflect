@@ -222,6 +222,72 @@ namespace ExpressionReflect.Tests
 			reflectionResult.Should().Be("Doe");
 			reflectionResult.Should().Be(emitResult);
 		}
+
+		[Test]
+		public void ShouldCreateSimpleFunc_ArrayAccess_Local()
+		{
+			// Arrange
+			Customer customer = new Customer("John", "Doe");
+			string[] array = new string[] { "One", "Two" };
+			Expression<Func<Customer, string>> expression = x => array[0];
+			Console.WriteLine(expression.ToString());
+
+			// Act
+			Func<Customer, string> emit = expression.Compile();
+			Func<Customer, string> reflection = expression.Reflect();
+
+			string emitResult = emit.Invoke(customer);
+			string reflectionResult = reflection.Invoke(customer);
+
+			// Assert
+			emitResult.Should().Be("One");
+			reflectionResult.Should().Be("One");
+			reflectionResult.Should().Be(emitResult);
+		}
+
+		[Test]
+		public void ShouldCreateSimpleFunc_ArrayAccess_Delegate()
+		{
+			// Arrange
+			Customer customer = new Customer("John", "Doe");
+			Func<string[]> func = () => new string[] { "One", "Two" };
+			Expression<Func<Customer, string>> expression = x => func()[0];
+			Console.WriteLine(expression.ToString());
+
+			// Act
+			Func<Customer, string> emit = expression.Compile();
+			Func<Customer, string> reflection = expression.Reflect();
+
+			string emitResult = emit.Invoke(customer);
+			string reflectionResult = reflection.Invoke(customer);
+
+			// Assert
+			emitResult.Should().Be("One");
+			reflectionResult.Should().Be("One");
+			reflectionResult.Should().Be(emitResult);
+		}
+
+		[Test]
+		public void ShouldCreateSimpleFunc_ArrayAccess_Delegate_CallingInvoke()
+		{
+			// Arrange
+			Customer customer = new Customer("John", "Doe");
+			Func<string[]> func = () => new string[] { "One", "Two" };
+			Expression<Func<Customer, string>> expression = x => func.Invoke()[0];
+			Console.WriteLine(expression.ToString());
+
+			// Act
+			Func<Customer, string> emit = expression.Compile();
+			Func<Customer, string> reflection = expression.Reflect();
+
+			string emitResult = emit.Invoke(customer);
+			string reflectionResult = reflection.Invoke(customer);
+
+			// Assert
+			emitResult.Should().Be("One");
+			reflectionResult.Should().Be("One");
+			reflectionResult.Should().Be(emitResult);
+		}
 	}
 }
 // ReSharper restore InconsistentNaming
