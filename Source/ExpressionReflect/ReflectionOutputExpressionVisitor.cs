@@ -84,13 +84,12 @@
 
 		protected override Expression VisitMethodCall(MethodCallExpression m)
 		{
-			Expression methodCallExpression = base.VisitMethodCall(m);
+			Expression expression = base.VisitMethodCall(m);
 
 			object target = null;
 			object[] parameterValues = this.GetValuesFromStack(m.Arguments.Count);		
 	
-			Expression expression = m.Object;
-			if(expression != null)
+			if (m.Object != null)
 			{
 				target = this.GetValueFromStack();
 			}
@@ -101,7 +100,7 @@
 
 			this.data.Push(value);
 			
-			return methodCallExpression;
+			return expression;
 		}
 
 		protected override Expression VisitInvocation(InvocationExpression iv)
@@ -131,7 +130,7 @@
 
 		protected override NewExpression VisitNew(NewExpression nex)
 		{
-			NewExpression newExpression = base.VisitNew(nex);
+			NewExpression expression = base.VisitNew(nex);
 
 			ConstructorInfo constructorInfo = nex.Constructor;
 			object[] parameterValues = this.GetValuesFromStack(nex.Arguments.Count);
@@ -139,12 +138,12 @@
 			object value = constructorInfo.Invoke(parameterValues.ToArray());
 			this.data.Push(value);
 
-			return newExpression;
+			return expression;
 		}
 
 		protected override Expression VisitBinary(BinaryExpression b)
 		{
-			Expression binaryExpression = base.VisitBinary(b);
+			Expression expression = base.VisitBinary(b);
 
 			object value;
 
@@ -239,7 +238,7 @@
 			value = Convert.ChangeType(value, type, CultureInfo.InvariantCulture);
 			this.data.Push(value);
 			
-			return binaryExpression;
+			return expression;
 		}
 
 		protected override Expression VisitTypeIs(TypeBinaryExpression b)
@@ -257,7 +256,7 @@
 
 		protected override Expression VisitUnary(UnaryExpression u)
 		{
-			Expression unaryExpression = base.VisitUnary(u);
+			Expression expression = base.VisitUnary(u);
 
 			object value;
 
@@ -302,7 +301,21 @@
 			value = Convert.ChangeType(value, type, CultureInfo.InvariantCulture);
 			this.data.Push(value);
 
-			return unaryExpression;
+			return expression;
+		}
+
+		protected override Expression VisitConditional(ConditionalExpression c)
+		{
+			Expression expression = base.VisitConditional(c);
+
+			object ifFalse = this.GetValueFromStack();
+			object ifTrue = this.GetValueFromStack();
+			bool test = (bool)this.GetValueFromStack();
+
+			object value = test ? ifTrue : ifFalse;
+			this.data.Push(value);
+
+			return expression;
 		}
 
 		protected override Expression VisitConstant(ConstantExpression c)

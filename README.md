@@ -183,3 +183,4 @@ Supported features
 * Array access
 * Array creation (simple arrays)
 * Object initializers (objects, lists, dictionaries)
+* Ternary conditionals
