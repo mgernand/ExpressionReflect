@@ -85,5 +85,10 @@
 		{
 			return customer.Age + AgeConstant;
 		}
+
+		public int CalculateLength(string str, Customer customer, int value)
+		{
+			return str.Length + customer.CalculationValue + value;
+		}
 	}
 }

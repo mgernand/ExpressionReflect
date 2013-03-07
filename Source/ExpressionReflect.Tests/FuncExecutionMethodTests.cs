@@ -484,6 +484,27 @@ namespace ExpressionReflect.Tests
 			reflectionResult.Should().Be(66);
 			reflectionResult.Should().Be(emitResult);
 		}
+
+		[Test]
+		public void ShouldCreateSimpleFunc_MethodCall_WithMixedParameters()
+		{
+			// Arrange
+			Customer customer = new Customer("John", "Doe");
+			Expression<Func<Customer, int>> expression = x => x.CalculateLength(x.Firstname, x, 10);
+			Console.WriteLine(expression.ToString());
+
+			// Act
+			Func<Customer, int> emit = expression.Compile();
+			Func<Customer, int> reflection = expression.Reflect();
+
+			int emitResult = emit.Invoke(customer);
+			int reflectionResult = reflection.Invoke(customer);
+
+			// Assert
+			emitResult.Should().Be(4);
+			reflectionResult.Should().Be(4);
+			reflectionResult.Should().Be(emitResult);
+		}
 	}
 }
 // ReSharper restore InconsistentNaming
