@@ -44,6 +44,11 @@ The following expression types are supported at the moment:
 x => x.Firstname
 ```
 
+* Simple property getter with subsequent method call
+```csharp
+x => x.Firstname.ToLower();
+```
+
 * Simple method call with return value
 ```csharp
 x => x.CalculateAge()

@@ -61,9 +61,21 @@
 
 			object[] parameterValues = this.GetValuesFromStack(m.Arguments);
 			MethodInfo methodInfo = m.Method;
-		
-			ParameterExpression parameter = (ParameterExpression)m.Object;
-			object value = methodInfo.Invoke(this.GetInvocationTarget(parameter), parameterValues);
+
+			object value = null;
+			Expression expression = m.Object;
+			if (expression is ParameterExpression) // Method call on expression variable (f.e x.DoSomething())
+			{
+				ParameterExpression parameter = (ParameterExpression)expression;
+				value = methodInfo.Invoke(this.GetInvocationTarget(parameter), parameterValues);
+			}
+			else if (expression is MemberExpression) // The method call was on a property (f.e. x.Text.ToLower());
+			{
+				MemberExpression parameter = (MemberExpression)expression;
+				object target = this.GetValueFromStack(parameter.Type);
+				value = methodInfo.Invoke(target, parameterValues);
+			}
+
 			this.evaluatedData.Push(value);
 			
 			return methodCallExpression;
