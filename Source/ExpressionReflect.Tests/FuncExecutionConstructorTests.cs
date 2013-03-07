@@ -11,7 +11,7 @@ namespace ExpressionReflect.Tests
 	public class FuncExecutionConstructorTests
 	{
 		[Test]
-		public void ShouldCreateSimpleFunc_New_WithoutParameters()
+		public void ShouldCreateSimpleFunc_New()
 		{
 			// Arrange
 			Customer customer = new Customer("John", "Doe");
@@ -248,6 +248,26 @@ namespace ExpressionReflect.Tests
 			emitResult.CalculationValue.Should().Be(110);
 			reflectionResult.CalculationValue.Should().Be(110);
 			reflectionResult.CalculationValue.Should().Be(emitResult.CalculationValue);
+		}
+
+		[Test]
+		public void ShouldCreateSimpleFunc_New_MethodCall()
+		{
+			// Arrange
+			Customer customer = new Customer("John", "Doe");
+			Expression<Func<Customer, int>> expression = x => new Customer().CalculateAge();
+			Console.WriteLine(expression.ToString());
+
+			// Act
+			Func<Customer, int> emit = expression.Compile();
+			Func<Customer, int> reflection = expression.Reflect();
+
+			int emitResult = emit.Invoke(customer);
+			int reflectionResult = reflection.Invoke(customer);
+
+			// Assert
+			emitResult.Should().Be(33);
+			reflectionResult.Should().Be(33);
 		}
 	}
 }

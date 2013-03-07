@@ -59,6 +59,7 @@
 		{
 			Expression methodCallExpression = base.VisitMethodCall(m);
 
+			object target = null;
 			object[] parameterValues = this.GetValuesFromStack(m.Arguments);
 			MethodInfo methodInfo = m.Method;
 
@@ -67,14 +68,25 @@
 			if (expression is ParameterExpression) // Method call on expression variable (f.e x.DoSomething())
 			{
 				ParameterExpression parameter = (ParameterExpression)expression;
-				value = methodInfo.Invoke(this.GetInvocationTarget(parameter), parameterValues);
+				target = this.GetInvocationTarget(parameter);
 			}
-			else if (expression is MemberExpression) // The method call was on a property (f.e. x.Text.ToLower());
+			else if (expression is MemberExpression) // The method call was on a property (f.e. x.Text.ToLower())
 			{
 				MemberExpression parameter = (MemberExpression)expression;
-				object target = this.GetValueFromStack(parameter.Type);
-				value = methodInfo.Invoke(target, parameterValues);
+				target = this.GetValueFromStack(parameter.Type);
 			}
+			else if(expression is MethodCallExpression) // The method was called on a method (f.e. x.ToString().ToLower())
+			{
+				MethodCallExpression parameter = (MethodCallExpression)expression;
+				target = this.GetValueFromStack(parameter.Type);
+			}
+			else if (expression is NewExpression) // The method was called on a constuctor (f.e. new Entity().DoSomething())
+			{
+				NewExpression parameter = (NewExpression)expression;
+				target = this.GetValueFromStack(parameter.Type);
+			}
+
+			value = methodInfo.Invoke(target, parameterValues);
 
 			this.evaluatedData.Push(value);
 			

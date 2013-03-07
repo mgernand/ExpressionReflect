@@ -54,6 +54,11 @@ x => x.Firstname.ToLower();
 x => x.CalculateAge()
 ```
 
+* Simple method call with return value and subsequent method call
+```csharp
+x => x.ToString().ToLower();
+```
+
 * Simple method call with return value and expression parameters
 ```csharp
 x => x.CalculateLength(x.Firstname);
@@ -99,6 +104,11 @@ x => x.Calculate(method(10));
 ```
 
 * Simple constructor call
+```csharp
+x => new Customer();
+```
+
+* Simple constructor call with subsequent method call
 ```csharp
 x => new Customer();
 ```
