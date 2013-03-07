@@ -148,7 +148,7 @@
 			Expression binaryExpression = base.VisitBinary(b);
 
 			object[] values = this.GetValuesFromStack(2);
-			object value;
+			object value = null;
 
 			// Todo: What if some implemented the operators in a custom class?
 			switch (b.NodeType)
@@ -213,7 +213,10 @@
 				//case ExpressionType.AddChecked:
 				//case ExpressionType.SubtractChecked:
 				//case ExpressionType.MultiplyChecked:					
-				//case ExpressionType.ArrayIndex:	
+				case ExpressionType.ArrayIndex:
+					object[] array = (object[])values.First();
+					value = array[Convert.ToInt64(values.Last())];
+					break;
 				default:
 					throw new ArgumentOutOfRangeException();
 			}

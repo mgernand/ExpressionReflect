@@ -180,3 +180,4 @@ Supported features
 * Local delegates with parameters (local and constant, binary expression)
 * Binary expressions (most)
 * Unary expressions (most)
+* Array access
