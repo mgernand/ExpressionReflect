@@ -22,13 +22,25 @@
 		{
 			this.Visit(expression);
 
-			if (this.evaluatedData.Count != 1)
+			if (this.evaluatedData.Count > 1)
 			{
 				throw new ArgumentException("The result stack contained too much elements.");
+			}
+			if (this.evaluatedData.Count < 1)
+			{
+				throw new ArgumentException("The result stack contained too few elements.");
 			}
 
 			object value = this.GetValueFromStack(returnType);
 			return value;
+		}
+
+		protected override Expression VisitParameter(ParameterExpression p)
+		{
+			object argument = this.args[p.Name];
+			this.evaluatedData.Push(argument);
+
+			return base.VisitParameter(p); ;
 		}
 
 		protected override Expression VisitMemberAccess(MemberExpression m)
@@ -40,7 +52,7 @@
 				PropertyInfo propertyInfo = (PropertyInfo)memberInfo;
 
 				ParameterExpression parameter = (ParameterExpression)m.Expression;
-				object value = propertyInfo.GetValue(this.GetInvocationTarget(parameter), null);
+				object value = propertyInfo.GetValue(this.GetValueFromStack(parameter.Type), null);
 				this.evaluatedData.Push(value);
 			}
 			if(memberInfo is FieldInfo)
@@ -52,7 +64,7 @@
 				}
 			}
 
-			return base.VisitMemberAccess(m);
+			return base.VisitMemberAccess(m);;
 		}
 
 		// Todo: Mix expression parameters with constant or other parameters
@@ -70,7 +82,7 @@
 			if (expression is ParameterExpression) // Method call on expression variable (f.e x.DoSomething())
 			{
 				ParameterExpression parameter = (ParameterExpression)expression;
-				target = this.GetInvocationTarget(parameter);
+				target = this.GetValueFromStack(parameter.Type);
 			}
 			else if (expression is MemberExpression) // The method call was on a property (f.e. x.Text.ToLower())
 			{
@@ -289,11 +301,6 @@
 			object parameterValue = this.evaluatedData.Pop();
 			parameterValue = Convert.ChangeType(parameterValue, conversionType, CultureInfo.InvariantCulture);
 			return parameterValue;
-		}
-
-		private object GetInvocationTarget(ParameterExpression parameter)
-		{
-			return this.args[parameter.Name];
 		}
 	}
 }

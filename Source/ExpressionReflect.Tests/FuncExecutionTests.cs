@@ -11,6 +11,27 @@ namespace ExpressionReflect.Tests
 	public class FuncExecutionTests
 	{
 		[Test]
+		public void ShouldCreateSimpleFunc_ReturnExpressionParameter()
+		{
+			// Arrange
+			Customer customer = new Customer("John", "Doe");
+			Expression<Func<Customer, Customer>> expression = x => x;
+			Console.WriteLine(expression.ToString());
+
+			// Act
+			Func<Customer, Customer> emit = expression.Compile();
+			Func<Customer, Customer> reflection = expression.Reflect();
+
+			Customer emitResult = emit.Invoke(customer);
+			Customer reflectionResult = reflection.Invoke(customer);
+
+			// Assert
+			emitResult.Should().NotBeNull();
+			reflectionResult.Should().NotBeNull();
+			reflectionResult.Should().BeSameAs(emitResult);
+		}
+
+		[Test]
 		public void ShouldCreateSimpleFunc_PropertyGetter()
 		{
 			// Arrange
