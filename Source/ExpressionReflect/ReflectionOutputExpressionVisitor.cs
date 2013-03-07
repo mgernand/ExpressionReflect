@@ -52,6 +52,8 @@
 			MemberInfo memberInfo = m.Member;
 
 			// Call Visit early if declaring type is not compiler generated.
+			// If the declaring type is compiler generated we need to wait
+			// with the call to Visit until after the variable name discovery.
 			bool callVisit = !memberInfo.DeclaringType.IsCompilerGenerated();
 			if (callVisit)
 			{
@@ -84,10 +86,19 @@
 			Expression methodCallExpression = base.VisitMethodCall(m);
 
 			object target = null;
-			object[] parameterValues = this.GetValuesFromStack(m.Arguments);
-			MethodInfo methodInfo = m.Method;
+			object[] parameterValues = null;
 
-			// Todo: What about extension methods/static method calls
+			MethodInfo methodInfo = m.Method;
+			bool isExtensionMethod = methodInfo.DeclaringType.IsExtensionMethod();
+			if(isExtensionMethod)
+			{
+				parameterValues = this.GetValuesFromStack(m.Arguments);
+			}
+			else
+			{
+				parameterValues = this.GetValuesFromStack(m.Arguments);
+			}		
+
 			object value = null;
 			Expression expression = m.Object;
 			if (expression is ParameterExpression) // Method call on expression variable (f.e x.DoSomething())
@@ -110,6 +121,7 @@
 				NewExpression parameter = (NewExpression)expression;
 				target = this.GetValueFromStack(parameter.Type);
 			}
+			// If expression is null the call is static, so the target must and will be null.
 
 			value = methodInfo.Invoke(target, parameterValues);
 
@@ -138,7 +150,7 @@
 			object[] values = this.GetValuesFromStack(2);
 			object value;
 
-			// Todo: What if some implemented the operators on their custom class?
+			// Todo: What if some implemented the operators in a custom class?
 			switch (b.NodeType)
 			{
 				case ExpressionType.Add:
@@ -282,6 +294,7 @@
 		private object[] GetValuesFromStack(IEnumerable<Expression> arguments)
 		{
 			IList<object> parameterValues = new List<object>();
+			arguments = arguments.Reverse();
 
 			Expression[] expressions = arguments.ToArray();
 			for (int i = 0; i < expressions.Count(); i++)

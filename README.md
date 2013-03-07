@@ -103,6 +103,11 @@ Func<int, int> method = x => x + 100;
 x => x.Calculate(method(10));
 ```
 
+* Simple method call with return value and mixed parameters
+```csharp
+x => x.CalculateLength(x.Firstname, x, 10);
+```
+
 * Simple constructor call
 ```csharp
 x => new Customer();
@@ -157,12 +162,17 @@ Func<int, int> method = x => x + 100;
 x => new Customer(method(10));
 ```
 
+* Simple constructor call with mixed parameters
+```csharp
+x => new Customer(x.Lastname, x, 10, x.Firstname);
+```
+
 Supported features
 ------------------
 
 * `Func<T, TResult>`
-* Method calls
-* Constructor invocations
+* Method calls with mixed parameters
+* Constructor invocations with mixed parameters
 * Local variables
 * Constant expressions
 * Local delegates

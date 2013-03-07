@@ -376,8 +376,6 @@ namespace ExpressionReflect.Tests
 			reflectionResult.Should().Be(emitResult);
 		}
 
-		///////////////////
-
 		[Test]
 		public void ShouldCreateSimpleFunc_ExtMethodCall()
 		{
@@ -394,8 +392,8 @@ namespace ExpressionReflect.Tests
 			int reflectionResult = reflection.Invoke(customer);
 
 			// Assert
-			emitResult.Should().Be(Customer.AgeConstant);
-			reflectionResult.Should().Be(Customer.AgeConstant);
+			emitResult.Should().Be(66);
+			reflectionResult.Should().Be(66);
 			reflectionResult.Should().Be(emitResult);
 		}
 
@@ -501,8 +499,8 @@ namespace ExpressionReflect.Tests
 			int reflectionResult = reflection.Invoke(customer);
 
 			// Assert
-			emitResult.Should().Be(4);
-			reflectionResult.Should().Be(4);
+			emitResult.Should().Be(14);
+			reflectionResult.Should().Be(14);
 			reflectionResult.Should().Be(emitResult);
 		}
 	}

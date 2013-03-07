@@ -29,6 +29,13 @@
 			this.Lastname = toCopy.Lastname;
 		}
 
+		public Customer(string firstname, Customer customer, int amount, string lastname)
+		{
+			this.Firstname = firstname;
+			this.Lastname = lastname;
+			this.calculationValue = customer.CalculateAge() + amount;
+		}
+
 		public string Firstname { get; set; }
 		public string Lastname { get; set; }
 		public int Age 
