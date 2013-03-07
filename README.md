@@ -39,130 +39,130 @@ The following built-in delegates are supported at the moment:
 
 The following expression types are supported at the moment:
 
-* Simple property getter
+* Property getter
 ```csharp
 x => x.Firstname
 ```
 
-* Simple property getter with subsequent method call
+* Property getter with subsequent method call
 ```csharp
 x => x.Firstname.ToLower();
 ```
 
-* Simple method call with return value
+* Method call with return value
 ```csharp
 x => x.CalculateAge()
 ```
 
-* Simple method call with return value and subsequent method call
+* Method call with return value and subsequent method call
 ```csharp
 x => x.ToString().ToLower();
 ```
 
-* Simple method call with return value and expression parameters
+* Method call with return value and expression parameters
 ```csharp
 x => x.CalculateLength(x.Firstname);
 ```
 
-* Simple method call with return value, expression parameters and binary expression
+* Method call with return value, expression parameters and binary expression
 ```csharp
 x => x.Calculate(x.Age + x.Value);
 ```
 
-* Simple method call with return value, expression parameters, binary expression and constant
+* Method call with return value, expression parameters, binary expression and constant
 ```csharp
 x => x.Calculate(x.Age + 100);
 ```
 
-* Simple method call with return value, expression parameters, binary expression and local variable
+* Method call with return value, expression parameters, binary expression and local variable
 ```csharp
 int value = 666;
 x => x.Calculate(value);
 ```
 
-* Simple method call with return value, expression parameters and nested constructor call.
+* Method call with return value, expression parameters and nested constructor call.
 ```csharp
 int value = 666;
 x => x.Calculate(new Customer(value));
 ```
 
-* Simple method call with return value, expression parameters and nested method call.
+* Method call with return value, expression parameters and nested method call.
 ```csharp
 x.Calculate(x.CalculateAge());
 ```
 
-* Simple method call with return value, expression parameters and local delegate call.
+* Method call with return value, expression parameters and local delegate call.
 ```csharp
 Func<int> method = () => 100;
 x => x.Calculate(method());
 ```
 
-* Simple method call with return value, expression parameters and local delegate call with parameters.
+* Method call with return value, expression parameters and local delegate call with parameters.
 ```csharp
 Func<int, int> method = x => x + 100;
 x => x.Calculate(method(10));
 ```
 
-* Simple method call with return value and mixed parameters
+* Method call with return value and mixed parameters
 ```csharp
 x => x.CalculateLength(x.Firstname, x, 10);
 ```
 
-* Simple constructor call
+* Constructor call
 ```csharp
 x => new Customer();
 ```
 
-* Simple constructor call with subsequent method call
+* Constructor call with subsequent method call
 ```csharp
 x => new Customer();
 ```
 
-* Simple constructor call with expression parameters
+* Constructor call with expression parameters
 ```csharp
 x => new Customer(x.Lastname, x.Firstname);
 ```
 
-* Simple constructor call with expression parameters and binary expression
+* Constructor call with expression parameters and binary expression
 ```csharp
 x => new Customer(x.Age + x.Value);
 ```
 
-* Simple constructor call with expression parameters, binary expression and constant
+* Constructor call with expression parameters, binary expression and constant
 ```csharp
 x => new Customer(x.Age + 100);
 ```
 
-* Simple constructor call with expression parameters, binary expression and local variable 
+* Constructor call with expression parameters, binary expression and local variable 
 ```csharp
 int value = 666;
 x => new Customer(value);
 ```
 
-* Simple constructor call with expression parameters and nested costructor call
+* Constructor call with expression parameters and nested costructor call
 ```csharp
 int value = 666;
 x => new Customer(new Customer(value));
 ```
 
-* Simple constructor call with expression parameters and nested method call.
+* Constructor call with expression parameters and nested method call.
 ```csharp
 x => new Customer(x.CalculateAge());
 ```
 
-* Simple constructor call with expression parameters and local delegate call.
+* Constructor call with expression parameters and local delegate call.
 ```csharp
 Func<int> method = () => 100;
 x => new Customer(method());
 ```
 
-* Simple constructor call with expression parameters and local delegate call with parameters.
+* Constructor call with expression parameters and local delegate call with parameters.
 ```csharp
 Func<int, int> method = x => x + 100;
 x => new Customer(method(10));
 ```
 
-* Simple constructor call with mixed parameters
+* Constructor call with mixed parameters
 ```csharp
 x => new Customer(x.Lastname, x, 10, x.Firstname);
 ```
