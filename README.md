@@ -182,5 +182,4 @@ Supported features
 * Unary expressions (almost complete)
 * Array access
 * Array creation (simple arrays)
-* Object initializers
-* List initializer
+* Object initializers (objects, lists, dictionaries)

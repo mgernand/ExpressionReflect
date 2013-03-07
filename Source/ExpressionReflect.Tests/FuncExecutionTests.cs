@@ -384,6 +384,33 @@ namespace ExpressionReflect.Tests
 			reflectionResult.Count.Should().Be(2);
 			reflectionResult[0].Should().Be("Hello");
 		}
+
+		[Test]
+		public void ShouldCreateSimpleFunc_DictionaryInitializer()
+		{
+			// Arrange
+			Customer customer = new Customer("John", "Doe");
+			Expression<Func<Customer, IDictionary<string, string>>> expression = 
+				x => new Dictionary<string, string>
+				{
+					{ "1", "Hello" },
+					{ "2", "World" }
+				};
+			Console.WriteLine(expression.ToString());
+
+			// Act
+			Func<Customer, IDictionary<string, string>> emit = expression.Compile();
+			Func<Customer, IDictionary<string, string>> reflection = expression.Reflect();
+
+			IDictionary<string, string> emitResult = emit.Invoke(customer);
+			IDictionary<string, string> reflectionResult = reflection.Invoke(customer);
+
+			// Assert
+			emitResult.Count.Should().Be(2);
+			emitResult["1"].Should().Be("Hello");
+			reflectionResult.Count.Should().Be(2);
+			reflectionResult["1"].Should().Be("Hello");
+		}
 	}
 }
 // ReSharper restore InconsistentNaming

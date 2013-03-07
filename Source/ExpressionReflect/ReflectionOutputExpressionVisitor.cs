@@ -7,6 +7,9 @@
 	using System.Linq.Expressions;
 	using System.Reflection;
 
+	/// <summary>
+	/// An expression visit that translates the expression tree into reflection calls.
+	/// </summary>
 	internal sealed class ReflectionOutputExpressionVisitor : ExpressionVisitor
 	{
 		private readonly IDictionary<string, object> args;
@@ -361,18 +364,28 @@
 			Expression expression = base.VisitListInit(init);
 
 			// Set 1: Get all values for initialization
-			object[] values = this.GetValuesFromStack(init.Initializers.Count);
+			int initializerArgumentCount = init.Initializers.First().Arguments.Count;
+			int initializerCount = init.Initializers.Count;
+			object[] values = this.GetValuesFromStack(initializerCount * initializerArgumentCount);
 
 			// Set 2: Get target from stack
 			object target = this.GetValueFromStack();
 
 			// Set 3: Add the values
-			for(int index = 0; index < init.Initializers.Count; index++)
+			for (int i = 0; i < initializerCount; i++)
 			{
-				ElementInit initializer = init.Initializers[index];
+				ElementInit initializer = init.Initializers[i];
+
+				object[] argumentValues = new object[initializerArgumentCount];
+				for(int j = 0; j < initializerArgumentCount; j++)
+				{
+					int index = (i * initializerArgumentCount) + j;
+					object arg = values[index];
+					argumentValues[j] = arg;
+				}
+
 				MethodInfo methodInfo = initializer.AddMethod;
-				object value = values[index];
-				methodInfo.Invoke(target, new object[] { value });
+				methodInfo.Invoke(target, argumentValues);
 			}
 
 			// Set 4: Put target back on the stack
@@ -387,7 +400,7 @@
 
 			for (int i = 0; i < count; i++)
 			{
-				object parameterValue = this.data.Pop();
+				object parameterValue = this.GetValueFromStack();
 				parameterValues.Add(parameterValue);
 			}
 
