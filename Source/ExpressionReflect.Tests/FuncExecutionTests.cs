@@ -116,6 +116,112 @@ namespace ExpressionReflect.Tests
 			reflectionResult.Should().Be(-10);
 			reflectionResult.Should().Be(emitResult);
 		}
+
+		[Test]
+		public void ShouldCreateSimpleFunc_Indexer()
+		{
+			// Arrange
+			Customer customer = new Customer("John", "Doe");
+			Expression<Func<Customer, int>> expression = x => x[2];
+			Console.WriteLine(expression.ToString());
+
+			// Act
+			Func<Customer, int> emit = expression.Compile();
+			Func<Customer, int> reflection = expression.Reflect();
+
+			int emitResult = emit.Invoke(customer);
+			int reflectionResult = reflection.Invoke(customer);
+
+			// Assert
+			emitResult.Should().Be(35);
+			reflectionResult.Should().Be(35);
+			reflectionResult.Should().Be(emitResult);
+		}
+
+		[Test]
+		public void ShouldCreateSimpleFunc_Indexer_MultipleParameters()
+		{
+			// Arrange
+			Customer customer = new Customer("John", "Doe");
+			int arg = 5;
+			Expression<Func<Customer, int>> expression = x => x[2, arg];
+			Console.WriteLine(expression.ToString());
+
+			// Act
+			Func<Customer, int> emit = expression.Compile();
+			Func<Customer, int> reflection = expression.Reflect();
+
+			int emitResult = emit.Invoke(customer);
+			int reflectionResult = reflection.Invoke(customer);
+
+			// Assert
+			emitResult.Should().Be(40);
+			reflectionResult.Should().Be(40);
+			reflectionResult.Should().Be(emitResult);
+		}
+
+		[Test]
+		public void ShouldCreateSimpleFunc_PropertyGetter_Indexer()
+		{
+			// Arrange
+			Customer customer = new Customer("John", "Doe");
+			Expression<Func<Customer, char>> expression = x => x.Firstname[0];
+			Console.WriteLine(expression.ToString());
+
+			// Act
+			Func<Customer, char> emit = expression.Compile();
+			Func<Customer, char> reflection = expression.Reflect();
+
+			char emitResult = emit.Invoke(customer);
+			char reflectionResult = reflection.Invoke(customer);
+
+			// Assert
+			emitResult.Should().Be('J');
+			reflectionResult.Should().Be('J');
+			reflectionResult.Should().Be(emitResult);
+		}
+
+		[Test]
+		public void ShouldCreateSimpleFunc_PropertyGetter_CustomIndexer()
+		{
+			// Arrange
+			Customer customer = new Customer("John", "Doe");
+			Expression<Func<Customer, int>> expression = x => x.NameIndex["John"];
+			Console.WriteLine(expression.ToString());
+
+			// Act
+			Func<Customer, int> emit = expression.Compile();
+			Func<Customer, int> reflection = expression.Reflect();
+
+			int emitResult = emit.Invoke(customer);
+			int reflectionResult = reflection.Invoke(customer);
+
+			// Assert
+			emitResult.Should().Be(0);
+			reflectionResult.Should().Be(0);
+			reflectionResult.Should().Be(emitResult);
+		}
+
+		[Test]
+		public void ShouldCreateSimpleFunc_ArrayAccess()
+		{
+			// Arrange
+			Customer customer = new Customer("John", "Doe");
+			Expression<Func<Customer, string>> expression = x => x.Names[1];
+			Console.WriteLine(expression.ToString());
+
+			// Act
+			Func<Customer, string> emit = expression.Compile();
+			Func<Customer, string> reflection = expression.Reflect();
+
+			string emitResult = emit.Invoke(customer);
+			string reflectionResult = reflection.Invoke(customer);
+
+			// Assert
+			emitResult.Should().Be("Doe");
+			reflectionResult.Should().Be("Doe");
+			reflectionResult.Should().Be(emitResult);
+		}
 	}
 }
 // ReSharper restore InconsistentNaming

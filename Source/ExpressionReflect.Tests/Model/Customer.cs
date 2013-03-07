@@ -53,6 +53,16 @@
 			get { return this.calculationValue; }
 		}
 
+		public NameIndex NameIndex
+		{
+			get { return new NameIndex(this.Firstname, this.Lastname); }
+		}
+
+		public string[] Names
+		{
+			get { return new string[] { this.Firstname, this.Lastname };}
+		}
+
 		public int CalculateAge()
 		{
 			return AgeConstant;
@@ -96,6 +106,16 @@
 		public int CalculateLength(string str, Customer customer, int value)
 		{
 			return str.Length + customer.CalculationValue + value;
+		}
+
+		public int this[int amount]
+		{
+			get { return this.Age + amount; }
+		}
+
+		public int this[int amount, int amount2]
+		{
+			get { return this[amount] + amount2; }
 		}
 	}
 }

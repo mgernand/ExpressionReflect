@@ -171,6 +171,7 @@ Supported features
 ------------------
 
 * `Func<T, TResult>`
+* Property getters including indexers
 * Method calls with mixed parameters
 * Constructor invocations with mixed parameters
 * Local variables
