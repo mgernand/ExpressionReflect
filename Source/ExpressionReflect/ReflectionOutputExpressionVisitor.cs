@@ -19,7 +19,7 @@
 			this.args = args;
 		}
 
-		internal object GetResult(Expression expression, Type returnType)
+		internal object GetResult(Expression expression)
 		{
 			this.Visit(expression);
 
@@ -32,7 +32,7 @@
 				throw new ArgumentException("The result stack contained too few elements.");
 			}
 
-			object value = this.GetValueFromStack(returnType);
+			object value = this.GetValueFromStack();
 			return value;
 		}
 
@@ -181,80 +181,97 @@
 		{
 			Expression binaryExpression = base.VisitBinary(b);
 
-			object[] values = this.GetValuesFromStack(2);
 			object value = null;
 
-			// Todo: What if some implemented the operators in a custom class?
-			switch (b.NodeType)
+			object[] values = this.GetValuesFromStack(2);	
+
+			MethodInfo methodInfo = b.Method;
+			if(methodInfo != null)
 			{
-				case ExpressionType.Add:
-					value = Convert.ToDouble(values.First()) + Convert.ToDouble(values.Last());
-					break;	
-				case ExpressionType.Subtract:
-					value = Convert.ToDouble(values.First()) - Convert.ToDouble(values.Last());
-					break;
-				case ExpressionType.Multiply:
-					value = Convert.ToDouble(values.First()) * Convert.ToDouble(values.Last());
-					break;
-				case ExpressionType.Divide:
-					value = Convert.ToDouble(values.First()) / Convert.ToDouble(values.Last());
-					break;
-				case ExpressionType.Modulo:
-					value = Convert.ToDouble(values.First()) % Convert.ToDouble(values.Last());
-					break;
-				case ExpressionType.Equal:
-					value = values.First() == values.Last();
-					break;
-				case ExpressionType.NotEqual:
-					value = values.First() != values.Last();
-					break;
-				case ExpressionType.And:
-					value = Convert.ToBoolean(values.First()) & Convert.ToBoolean(values.Last());
-					break;
-				case ExpressionType.AndAlso:
-					value = Convert.ToBoolean(values.First()) && Convert.ToBoolean(values.Last());
-					break;
-				case ExpressionType.Or:
-					value = Convert.ToBoolean(values.First()) | Convert.ToBoolean(values.Last());
-					break;
-				case ExpressionType.OrElse:
-					value = Convert.ToBoolean(values.First()) || Convert.ToBoolean(values.Last());
-					break;
-				case ExpressionType.ExclusiveOr:
-					value = Convert.ToBoolean(values.First()) ^ Convert.ToBoolean(values.Last());
-					break;
-				case ExpressionType.LessThan:
-					value = Convert.ToDouble(values.First()) < Convert.ToDouble(values.Last());
-					break;
-				case ExpressionType.LessThanOrEqual:
-					value = Convert.ToDouble(values.First()) <= Convert.ToDouble(values.Last());
-					break;
-				case ExpressionType.GreaterThan:
-					value = Convert.ToDouble(values.First()) > Convert.ToDouble(values.Last());
-					break;
-				case ExpressionType.GreaterThanOrEqual:
-					value = Convert.ToDouble(values.First()) >= Convert.ToDouble(values.Last());
-					break;
-				case ExpressionType.RightShift:
-					value = Convert.ToInt64(values.First()) >> Convert.ToInt32(values.Last());
-					break;
-				case ExpressionType.LeftShift:
-					value = Convert.ToInt64(values.First()) << Convert.ToInt32(values.Last());
-					break;
-				case ExpressionType.Coalesce:
-					value = values.First() ?? values.Last();
-					break;
-				//case ExpressionType.AddChecked:
-				//case ExpressionType.SubtractChecked:
-				//case ExpressionType.MultiplyChecked:					
-				case ExpressionType.ArrayIndex:
-					object[] array = (object[])values.First();
-					value = array[Convert.ToInt64(values.Last())];
-					break;
-				default:
-					throw new ArgumentOutOfRangeException();
+				// If an operator method is available use it.
+				value = methodInfo.Invoke(null, values);
+			}
+			else
+			{
+				switch (b.NodeType)
+				{
+					case ExpressionType.Add:
+						value = Convert.ToDouble(values.First()) + Convert.ToDouble(values.Last());
+						break;
+					case ExpressionType.AddChecked:
+						value = checked(Convert.ToDouble(values.First()) + Convert.ToDouble(values.Last()));
+						break;
+					case ExpressionType.Subtract:
+						value = Convert.ToDouble(values.First()) - Convert.ToDouble(values.Last());
+						break;
+					case ExpressionType.SubtractChecked:
+						value = checked(Convert.ToDouble(values.First()) - Convert.ToDouble(values.Last()));
+						break;
+					case ExpressionType.Multiply:
+						value = Convert.ToDouble(values.First()) * Convert.ToDouble(values.Last());
+						break;
+					case ExpressionType.MultiplyChecked:
+						value = checked(Convert.ToDouble(values.First()) * Convert.ToDouble(values.Last()));
+						break;
+					case ExpressionType.Divide:
+						value = Convert.ToDouble(values.First()) / Convert.ToDouble(values.Last());
+						break;
+					case ExpressionType.Modulo:
+						value = Convert.ToDouble(values.First()) % Convert.ToDouble(values.Last());
+						break;
+					case ExpressionType.Equal:
+						value = values.First() == values.Last();
+						break;
+					case ExpressionType.NotEqual:
+						value = values.First() != values.Last();
+						break;
+					case ExpressionType.And:
+						value = Convert.ToBoolean(values.First()) & Convert.ToBoolean(values.Last());
+						break;
+					case ExpressionType.AndAlso:
+						value = Convert.ToBoolean(values.First()) && Convert.ToBoolean(values.Last());
+						break;
+					case ExpressionType.Or:
+						value = Convert.ToBoolean(values.First()) | Convert.ToBoolean(values.Last());
+						break;
+					case ExpressionType.OrElse:
+						value = Convert.ToBoolean(values.First()) || Convert.ToBoolean(values.Last());
+						break;
+					case ExpressionType.ExclusiveOr:
+						value = Convert.ToBoolean(values.First()) ^ Convert.ToBoolean(values.Last());
+						break;
+					case ExpressionType.LessThan:
+						value = Convert.ToDouble(values.First()) < Convert.ToDouble(values.Last());
+						break;
+					case ExpressionType.LessThanOrEqual:
+						value = Convert.ToDouble(values.First()) <= Convert.ToDouble(values.Last());
+						break;
+					case ExpressionType.GreaterThan:
+						value = Convert.ToDouble(values.First()) > Convert.ToDouble(values.Last());
+						break;
+					case ExpressionType.GreaterThanOrEqual:
+						value = Convert.ToDouble(values.First()) >= Convert.ToDouble(values.Last());
+						break;
+					case ExpressionType.RightShift:
+						value = Convert.ToInt64(values.First()) >> Convert.ToInt32(values.Last());
+						break;
+					case ExpressionType.LeftShift:
+						value = Convert.ToInt64(values.First()) << Convert.ToInt32(values.Last());
+						break;
+					case ExpressionType.Coalesce:
+						value = values.First() ?? values.Last();
+						break;
+					case ExpressionType.ArrayIndex:
+						object[] array = (object[])values.First();
+						value = array[Convert.ToInt64(values.Last())];
+						break;
+					default:
+						throw new ArgumentOutOfRangeException();
+				}
 			}
 
+			Type type = b.Type;
+			value = Convert.ChangeType(value, type, CultureInfo.InvariantCulture);
 			this.data.Push(value);
 			
 			return binaryExpression;
@@ -264,34 +281,47 @@
 		{
 			Expression unaryExpression = base.VisitUnary(u);
 
-			object[] values = this.GetValuesFromStack(1);
-			object value;
+			object value = null;
 
-			switch (u.NodeType)
+			object[] values = this.GetValuesFromStack(1);
+			MethodInfo methodInfo = u.Method;
+			if(methodInfo != null)
 			{
-				case ExpressionType.Negate:
-					value = -Convert.ToDouble(values.First());
-					break;
-				case ExpressionType.Not:
-					if(values.First() is bool)
-					{
-						value = !Convert.ToBoolean(values.First());
-					}
-					else
-					{
-						value = ~Convert.ToInt64(values.First());
-					}				
-					break;
-				//case ExpressionType.NegateChecked:
-				//case ExpressionType.Quote:
-				//case ExpressionType.Convert:
-				//case ExpressionType.ConvertChecked:
-				//case ExpressionType.ArrayLength:
-				//case ExpressionType.TypeAs:
-				default:
-					throw new ArgumentOutOfRangeException();
+				// If an operator method is available use it.
+				value = methodInfo.Invoke(null, values);
+			}
+			else
+			{
+				switch (u.NodeType)
+				{
+					case ExpressionType.Negate:
+						value = -Convert.ToDouble(values.First());
+						break;
+					case ExpressionType.NegateChecked:
+						value = checked(-Convert.ToDouble(values.First()));
+						break;
+					case ExpressionType.Not:
+						if (values.First() is bool)
+						{
+							value = !Convert.ToBoolean(values.First());
+						}
+						else
+						{
+							value = ~Convert.ToInt64(values.First());
+						}
+						break;
+					//case ExpressionType.Quote:
+					//case ExpressionType.Convert:
+					//case ExpressionType.ConvertChecked:
+					//case ExpressionType.ArrayLength:
+					//case ExpressionType.TypeAs:
+					default:
+						throw new ArgumentOutOfRangeException();
+				}
 			}
 
+			Type type = u.Operand.Type;
+			value = Convert.ChangeType(value, type, CultureInfo.InvariantCulture);
 			this.data.Push(value);
 
 			return unaryExpression;
@@ -359,6 +389,31 @@
 			}
 
 			// Set 4 : Put initialized instance back on the stack.
+			this.data.Push(target);
+
+			return expression;
+		}
+
+		protected override Expression VisitListInit(ListInitExpression init)
+		{
+			Expression expression = base.VisitListInit(init);
+
+			// Set 1: Get all values for initialization
+			object[] values = this.GetValuesFromStack(init.Initializers.Count);
+
+			// Set 2: Get target from stack
+			object target = this.GetValueFromStack();
+
+			// Set 3: Add the values
+			for(int index = 0; index < init.Initializers.Count; index++)
+			{
+				ElementInit initializer = init.Initializers[index];
+				MethodInfo methodInfo = initializer.AddMethod;
+				object value = values[index];
+				methodInfo.Invoke(target, new object[] { value });
+			}
+
+			// Set 4: Put target back on the stack
 			this.data.Push(target);
 
 			return expression;

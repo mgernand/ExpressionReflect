@@ -2,6 +2,7 @@
 namespace ExpressionReflect.Tests
 {
 	using System;
+	using System.Collections.Generic;
 	using System.Linq.Expressions;
 	using ExpressionReflect.Tests.Model;
 	using FluentAssertions;
@@ -357,6 +358,31 @@ namespace ExpressionReflect.Tests
 			reflectionResult.Firstname.Should().Be("John");
 			emitResult.Lastname.Should().Be("Doe");
 			reflectionResult.Lastname.Should().Be("Doe");
+		}
+
+		[Test]
+		public void ShouldCreateSimpleFunc_ListInitializer()
+		{
+			// Arrange
+			Customer customer = new Customer("John", "Doe");
+			Expression<Func<Customer, IList<string>>> expression = x => new List<string>
+			{
+				"Hello", "World"
+			};
+			Console.WriteLine(expression.ToString());
+
+			// Act
+			Func<Customer, IList<string>> emit = expression.Compile();
+			Func<Customer, IList<string>> reflection = expression.Reflect();
+
+			IList<string> emitResult = emit.Invoke(customer);
+			IList<string> reflectionResult = reflection.Invoke(customer);
+
+			// Assert
+			emitResult.Count.Should().Be(2);
+			emitResult[0].Should().Be("Hello");
+			reflectionResult.Count.Should().Be(2);
+			reflectionResult[0].Should().Be("Hello");
 		}
 	}
 }

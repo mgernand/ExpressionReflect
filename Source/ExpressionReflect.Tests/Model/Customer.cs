@@ -41,6 +41,7 @@
 
 		public string Firstname { get; set; }
 		public string Lastname { get; set; }
+
 		public int Age 
 		{
 			get { return this.CalculateAge(); }
@@ -65,6 +66,8 @@
 		{
 			get { return new string[] { this.Firstname, this.Lastname };}
 		}
+
+		public bool IsPremium { get; set; }
 
 		public int CalculateAge()
 		{

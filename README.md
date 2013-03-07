@@ -178,8 +178,9 @@ Supported features
 * Constant expressions
 * Local delegates
 * Local delegates with parameters (local and constant, binary expression)
-* Binary expressions (most)
-* Unary expressions (most)
+* Binary expressions (almost complete)
+* Unary expressions (almost complete)
 * Array access
-* Array creation
+* Array creation (simple arrays)
 * Object initializers
+* List initializer
