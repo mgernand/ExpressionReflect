@@ -11,10 +11,6 @@ namespace ExpressionReflect
 	/// </summary>
 	public abstract class ExpressionVisitor
 	{
-		protected ExpressionVisitor()
-		{
-		}
-
 		protected virtual Expression Visit(Expression exp)
 		{
 			if (exp == null)

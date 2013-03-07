@@ -11,7 +11,7 @@
 	internal sealed class ReflectionOutputExpressionVisitor : ExpressionVisitor
 	{
 		private readonly IDictionary<string, object> args;
-		private readonly Stack<object> evaluatedData = new Stack<object>();
+		private readonly Stack<object> data = new Stack<object>();
 		private readonly Stack<string> localVariableNames = new Stack<string>(); 
 
 		internal ReflectionOutputExpressionVisitor(IDictionary<string, object> args)
@@ -23,11 +23,11 @@
 		{
 			this.Visit(expression);
 
-			if (this.evaluatedData.Count > 1)
+			if (this.data.Count > 1)
 			{
 				throw new ArgumentException("The result stack contained too much elements.");
 			}
-			if (this.evaluatedData.Count < 1)
+			if (this.data.Count < 1)
 			{
 				throw new ArgumentException("The result stack contained too few elements.");
 			}
@@ -41,7 +41,7 @@
 			Expression expression = base.VisitParameter(p);
 
 			object argument = this.args[p.Name];
-			this.evaluatedData.Push(argument);
+			this.data.Push(argument);
 			
 			return expression;
 		}
@@ -67,7 +67,7 @@
 
 				ParameterExpression parameter = (ParameterExpression)m.Expression;
 				object value = propertyInfo.GetValue(this.GetValueFromStack(parameter.Type), null);
-				this.evaluatedData.Push(value);
+				this.data.Push(value);
 			}
 			if(memberInfo is FieldInfo)
 			{
@@ -81,7 +81,6 @@
 			return expression ?? base.VisitMemberAccess(m);
 		}
 
-		// Todo: Mix expression parameters with constant or other parameters
 		protected override Expression VisitMethodCall(MethodCallExpression m)
 		{
 			Expression methodCallExpression = base.VisitMethodCall(m);
@@ -135,7 +134,7 @@
 			// If expression is null the call is static, so the target must and will be null.
 			value = methodInfo.Invoke(target, parameterValues);
 
-			this.evaluatedData.Push(value);
+			this.data.Push(value);
 			
 			return methodCallExpression;
 		}
@@ -149,7 +148,7 @@
 			if(iv.Expression is MemberExpression)
 			{
 				// Use the delegate on the stack. The constant expression visitor pushed it there.
-				value = this.evaluatedData.Pop();
+				value = this.GetValueFromStack();
 
 				if (value is Delegate)
 				{
@@ -160,7 +159,7 @@
 				}
 			}
 
-			this.evaluatedData.Push(value);
+			this.data.Push(value);
 
 			return expression;
 		}
@@ -173,7 +172,7 @@
 			object[] parameterValues = this.GetValuesFromStack(nex.Arguments);
 
 			object value = constructorInfo.Invoke(parameterValues.ToArray());
-			this.evaluatedData.Push(value);
+			this.data.Push(value);
 
 			return newExpression;
 		}
@@ -256,7 +255,7 @@
 					throw new ArgumentOutOfRangeException();
 			}
 
-			this.evaluatedData.Push(value);
+			this.data.Push(value);
 			
 			return binaryExpression;
 		}
@@ -293,7 +292,7 @@
 					throw new ArgumentOutOfRangeException();
 			}
 
-			this.evaluatedData.Push(value);
+			this.data.Push(value);
 
 			return unaryExpression;
 		}
@@ -310,21 +309,13 @@
 
 				FieldInfo fieldInfo = (FieldInfo)memberInfo;
 				value = fieldInfo.GetValue(c.Value);
-
-				//if (value is Delegate)
-				//{
-				//	Delegate del = (Delegate)value;
-				//	ParameterInfo[] parameterInfos = del.Method.GetParameters();
-				//	object[] parameterValues = GetValuesFromStack(parameterInfos.Length);
-				//	value = del.DynamicInvoke(parameterValues);
-				//}
 			}
 			else
 			{
 				value = c.Value;
 			}
 
-			this.evaluatedData.Push(value);
+			this.data.Push(value);
 
 			return base.VisitConstant(c);
 		}
@@ -339,7 +330,36 @@
 			Array array = Array.CreateInstance(type, arrayValues.Length);
 			Array.Copy(arrayValues, array, arrayValues.Length);
 			
-			this.evaluatedData.Push(array);
+			this.data.Push(array);
+
+			return expression;
+		}
+
+		protected override Expression VisitMemberInit(MemberInitExpression init)
+		{
+			Expression expression = base.VisitMemberInit(init);
+
+			// Step 1: Get all values for the initialization
+			object[] values = this.GetValuesFromStack(init.Bindings.Count);
+
+			// Set 2: Get target from stack
+			object target = this.GetValueFromStack();
+
+			// Set 3: Initialize the properties.
+			for(int index = 0; index < init.Bindings.Count; index++)
+			{
+				MemberBinding binding = init.Bindings[index];
+				MemberInfo memberInfo = binding.Member;
+				if(memberInfo is PropertyInfo)
+				{
+					PropertyInfo propertyInfo = (PropertyInfo)memberInfo;
+					object value = values[index];
+					propertyInfo.SetValue(target, value, null);
+				}
+			}
+
+			// Set 4 : Put initialized instance back on the stack.
+			this.data.Push(target);
 
 			return expression;
 		}
@@ -366,7 +386,7 @@
 
 			for (int i = 0; i < count; i++)
 			{
-				object parameterValue = this.evaluatedData.Pop();
+				object parameterValue = this.data.Pop();
 				parameterValues.Add(parameterValue);
 			}
 
@@ -375,8 +395,14 @@
 
 		private object GetValueFromStack(Type conversionType)
 		{
-			object parameterValue = this.evaluatedData.Pop();
+			object parameterValue = this.data.Pop();
 			parameterValue = Convert.ChangeType(parameterValue, conversionType, CultureInfo.InvariantCulture);
+			return parameterValue;
+		}
+
+		private object GetValueFromStack()
+		{
+			object parameterValue = this.data.Pop();
 			return parameterValue;
 		}
 	}

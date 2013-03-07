@@ -332,6 +332,32 @@ namespace ExpressionReflect.Tests
 			reflectionResult.Should().Be("ello tes");
 			reflectionResult.Should().Be(emitResult);
 		}
+
+		[Test]
+		public void ShouldCreateSimpleFunc_ObjectInitializer()
+		{
+			// Arrange
+			Customer customer = new Customer("John", "Doe");
+			Expression<Func<Customer, Customer>> expression = x => new Customer
+			{
+				Firstname = x.Firstname, 
+				Lastname = x.Lastname
+			};
+			Console.WriteLine(expression.ToString());
+
+			// Act
+			Func<Customer, Customer> emit = expression.Compile();
+			Func<Customer, Customer> reflection = expression.Reflect();
+
+			Customer emitResult = emit.Invoke(customer);
+			Customer reflectionResult = reflection.Invoke(customer);
+
+			// Assert
+			emitResult.Firstname.Should().Be("John");
+			reflectionResult.Firstname.Should().Be("John");
+			emitResult.Lastname.Should().Be("Doe");
+			reflectionResult.Lastname.Should().Be("Doe");
+		}
 	}
 }
 // ReSharper restore InconsistentNaming

@@ -1,5 +1,8 @@
 ﻿namespace ExpressionReflect.Tests.Model
 {
+	using System.Diagnostics;
+
+	[DebuggerDisplay("Customer: {ToString()}")]
 	public class Customer
 	{
 		public const int AgeConstant = 33;

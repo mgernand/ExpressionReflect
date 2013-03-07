@@ -182,3 +182,4 @@ Supported features
 * Unary expressions (most)
 * Array access
 * Array creation
+* Object initializers
