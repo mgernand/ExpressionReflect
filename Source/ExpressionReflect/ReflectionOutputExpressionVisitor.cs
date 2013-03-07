@@ -2,7 +2,6 @@
 {
 	using System;
 	using System.Collections.Generic;
-	using System.Collections.ObjectModel;
 	using System.Globalization;
 	using System.Linq;
 	using System.Linq.Expressions;
@@ -48,7 +47,7 @@
 
 		protected override Expression VisitMemberAccess(MemberExpression m)
 		{
-			// Note: Call base.VisitMemberAccess(m) late for local variables special case.
+			// Call base.VisitMemberAccess(m) late for local variables special case.
 			Expression expression = null;
 			MemberInfo memberInfo = m.Member;
 
@@ -65,8 +64,7 @@
 			{
 				PropertyInfo propertyInfo = (PropertyInfo)memberInfo;
 
-				ParameterExpression parameter = (ParameterExpression)m.Expression;
-				object value = propertyInfo.GetValue(this.GetValueFromStack(parameter.Type), null);
+				object value = propertyInfo.GetValue(this.GetValueFromStack(), null);
 				this.data.Push(value);
 			}
 			if(memberInfo is FieldInfo)
@@ -86,53 +84,17 @@
 			Expression methodCallExpression = base.VisitMethodCall(m);
 
 			object target = null;
-			object[] parameterValues = null;
-
-			MethodInfo methodInfo = m.Method;
-			bool isExtensionMethod = methodInfo.DeclaringType.IsExtensionMethod();
-			if(isExtensionMethod)
-			{
-				parameterValues = this.GetValuesFromStack(m.Arguments);
-			}
-			else
-			{
-				parameterValues = this.GetValuesFromStack(m.Arguments);
-			}		
-
-			object value = null;
+			object[] parameterValues = this.GetValuesFromStack(m.Arguments.Count);		
+	
 			Expression expression = m.Object;
-
 			if(expression != null)
 			{
-				if(expression is ParameterExpression) // Method call on expression variable (f.e x.DoSomething())
-				{
-					ParameterExpression parameter = (ParameterExpression)expression;
-					target = this.GetValueFromStack(parameter.Type);
-				}
-				else if(expression is MemberExpression) // The method call was on a property (f.e. x.Text.ToLower())
-				{
-					MemberExpression parameter = (MemberExpression)expression;
-					target = this.GetValueFromStack(parameter.Type);
-				}
-				else if(expression is MethodCallExpression) // The method was called on a method (f.e. x.ToString().ToLower())
-				{
-					MethodCallExpression parameter = (MethodCallExpression)expression;
-					target = this.GetValueFromStack(parameter.Type);
-				}
-				else if(expression is NewExpression) // The method was called on a constuctor (f.e. new Entity().DoSomething())
-				{
-					NewExpression parameter = (NewExpression)expression;
-					target = this.GetValueFromStack(parameter.Type);
-				}
-				else if(expression is InvocationExpression) // Teh method was called on a delegate
-				{
-					InvocationExpression parameter = (InvocationExpression)expression;
-					target = this.GetValueFromStack(parameter.Type);
-				}
+				target = this.GetValueFromStack();
 			}
 
 			// If expression is null the call is static, so the target must and will be null.
-			value = methodInfo.Invoke(target, parameterValues);
+			MethodInfo methodInfo = m.Method;
+			object value = methodInfo.Invoke(target, parameterValues);
 
 			this.data.Push(value);
 			
@@ -169,7 +131,7 @@
 			NewExpression newExpression = base.VisitNew(nex);
 
 			ConstructorInfo constructorInfo = nex.Constructor;
-			object[] parameterValues = this.GetValuesFromStack(nex.Arguments);
+			object[] parameterValues = this.GetValuesFromStack(nex.Arguments.Count);
 
 			object value = constructorInfo.Invoke(parameterValues.ToArray());
 			this.data.Push(value);
@@ -181,7 +143,7 @@
 		{
 			Expression binaryExpression = base.VisitBinary(b);
 
-			object value = null;
+			object value;
 
 			object[] values = this.GetValuesFromStack(2);	
 
@@ -281,7 +243,7 @@
 		{
 			Expression unaryExpression = base.VisitUnary(u);
 
-			object value = null;
+			object value;
 
 			object[] values = this.GetValuesFromStack(1);
 			MethodInfo methodInfo = u.Method;
@@ -329,7 +291,7 @@
 
 		protected override Expression VisitConstant(ConstantExpression c)
 		{
-			object value = null;
+			object value;
 
 			bool isCompilerGenerated = c.Type.IsCompilerGenerated();
 			if (isCompilerGenerated) // Special case for local variables
@@ -354,7 +316,7 @@
 		{
 			Expression expression = base.VisitNewArray(na);
 
-			Array arrayValues = this.GetValuesFromStack(na.Expressions);
+			Array arrayValues = this.GetValuesFromStack(na.Expressions.Count);
 			Type type = na.Type.GetElementType();
 
 			Array array = Array.CreateInstance(type, arrayValues.Length);
@@ -419,22 +381,6 @@
 			return expression;
 		}
 
-		private object[] GetValuesFromStack(IEnumerable<Expression> arguments)
-		{
-			IList<object> parameterValues = new List<object>();
-			arguments = arguments.Reverse();
-
-			Expression[] expressions = arguments.ToArray();
-			for (int i = 0; i < expressions.Count(); i++)
-			{
-				Expression expression = expressions[i];
-				object parameterValue = this.GetValueFromStack(expression.Type);
-				parameterValues.Add(parameterValue);
-			}
-
-			return parameterValues.Reverse().ToArray();
-		}
-
 		private object[] GetValuesFromStack(int count)
 		{
 			IList<object> parameterValues = new List<object>();
@@ -446,13 +392,6 @@
 			}
 
 			return parameterValues.Reverse().ToArray();
-		}
-
-		private object GetValueFromStack(Type conversionType)
-		{
-			object parameterValue = this.data.Pop();
-			parameterValue = Convert.ChangeType(parameterValue, conversionType, CultureInfo.InvariantCulture);
-			return parameterValue;
 		}
 
 		private object GetValueFromStack()
