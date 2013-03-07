@@ -288,6 +288,28 @@ namespace ExpressionReflect.Tests
 			reflectionResult.Should().Be("One");
 			reflectionResult.Should().Be(emitResult);
 		}
+
+		[Test]
+		public void ShouldCreateSimpleFunc_ArrayAccess_Delegate_CallingMethod()
+		{
+			// Arrange
+			Customer customer = new Customer("John", "Doe");
+			Func<string> func = () => "Hello";
+			Expression<Func<Customer, string>> expression = x => func().ToLower();
+			Console.WriteLine(expression.ToString());
+
+			// Act
+			Func<Customer, string> emit = expression.Compile();
+			Func<Customer, string> reflection = expression.Reflect();
+
+			string emitResult = emit.Invoke(customer);
+			string reflectionResult = reflection.Invoke(customer);
+
+			// Assert
+			emitResult.Should().Be("hello");
+			reflectionResult.Should().Be("hello");
+			reflectionResult.Should().Be(emitResult);
+		}
 	}
 }
 // ReSharper restore InconsistentNaming

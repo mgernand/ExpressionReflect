@@ -101,28 +101,32 @@
 
 			object value = null;
 			Expression expression = m.Object;
-			if (expression is ParameterExpression) // Method call on expression variable (f.e x.DoSomething())
-			{
-				ParameterExpression parameter = (ParameterExpression)expression;
-				target = this.GetValueFromStack(parameter.Type);
-			}
-			else if (expression is MemberExpression) // The method call was on a property (f.e. x.Text.ToLower())
-			{
-				MemberExpression parameter = (MemberExpression)expression;
-				target = this.GetValueFromStack(parameter.Type);
-			}
-			else if(expression is MethodCallExpression) // The method was called on a method (f.e. x.ToString().ToLower())
-			{
-				MethodCallExpression parameter = (MethodCallExpression)expression;
-				target = this.GetValueFromStack(parameter.Type);
-			}
-			else if (expression is NewExpression) // The method was called on a constuctor (f.e. new Entity().DoSomething())
-			{
-				NewExpression parameter = (NewExpression)expression;
-				target = this.GetValueFromStack(parameter.Type);
-			}
-			// If expression is null the call is static, so the target must and will be null.
 
+			if(expression != null)
+			{
+				if(expression is ParameterExpression) // Method call on expression variable (f.e x.DoSomething())
+				{
+					ParameterExpression parameter = (ParameterExpression)expression;
+					target = this.GetValueFromStack(parameter.Type);
+				}
+				else if(expression is MemberExpression) // The method call was on a property (f.e. x.Text.ToLower())
+				{
+					MemberExpression parameter = (MemberExpression)expression;
+					target = this.GetValueFromStack(parameter.Type);
+				}
+				else if(expression is MethodCallExpression) // The method was called on a method (f.e. x.ToString().ToLower())
+				{
+					MethodCallExpression parameter = (MethodCallExpression)expression;
+					target = this.GetValueFromStack(parameter.Type);
+				}
+				else if(expression is NewExpression) // The method was called on a constuctor (f.e. new Entity().DoSomething())
+				{
+					NewExpression parameter = (NewExpression)expression;
+					target = this.GetValueFromStack(parameter.Type);
+				}
+			}
+
+			// If expression is null the call is static, so the target must and will be null.
 			value = methodInfo.Invoke(target, parameterValues);
 
 			this.evaluatedData.Push(value);
