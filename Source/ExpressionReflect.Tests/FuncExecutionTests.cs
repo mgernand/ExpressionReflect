@@ -411,6 +411,48 @@ namespace ExpressionReflect.Tests
 			reflectionResult.Count.Should().Be(2);
 			reflectionResult["1"].Should().Be("Hello");
 		}
+
+		[Test]
+		public void ShouldCreateSimpleFunc_CreateNewArray()
+		{
+			// Arrange
+			Customer customer = new Customer("John", "Doe");
+			Expression<Func<Customer, string[]>> expression = x => new string[] { "1", "2" };
+			Console.WriteLine(expression.ToString());
+
+			// Act
+			Func<Customer, string[]> emit = expression.Compile();
+			Func<Customer, string[]> reflection = expression.Reflect();
+
+			string[] emitResult = emit.Invoke(customer);
+			string[] reflectionResult = reflection.Invoke(customer);
+
+			// Assert
+			emitResult[0].Should().Be("1");
+			reflectionResult[0].Should().Be("1");
+			reflectionResult[0].Should().Be(emitResult[0]);
+		}
+
+		[Test]
+		public void ShouldCreateSimpleFunc_CreateNewArray_Bounds()
+		{
+			// Arrange
+			Customer customer = new Customer("John", "Doe");
+			Expression<Func<Customer, string[]>> expression = x => new string[12];
+			Console.WriteLine(expression.ToString());
+
+			// Act
+			Func<Customer, string[]> emit = expression.Compile();
+			Func<Customer, string[]> reflection = expression.Reflect();
+
+			string[] emitResult = emit.Invoke(customer);
+			string[] reflectionResult = reflection.Invoke(customer);
+
+			// Assert
+			emitResult.Length.Should().Be(12);
+			reflectionResult.Length.Should().Be(12);
+			reflectionResult.Length.Should().Be(emitResult.Length);
+		}
 	}
 }
 // ReSharper restore InconsistentNaming

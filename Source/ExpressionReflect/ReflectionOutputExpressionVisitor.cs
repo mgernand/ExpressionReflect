@@ -263,48 +263,62 @@
 		{
 			Expression expression = base.VisitUnary(u);
 
-			object value;
+			object result;
+			object value = this.GetValueFromStack();
 
-			object[] values = this.GetValuesFromStack(1);
 			MethodInfo methodInfo = u.Method;
 			if(methodInfo != null)
 			{
 				// If an operator method is available use it.
-				value = methodInfo.Invoke(null, values);
+				result = methodInfo.Invoke(null, new object[] { value });
 			}
 			else
 			{
 				switch (u.NodeType)
 				{
 					case ExpressionType.Negate:
-						value = -Convert.ToDouble(values.First());
+						result = -Convert.ToDouble(value);
 						break;
 					case ExpressionType.NegateChecked:
-						value = checked(-Convert.ToDouble(values.First()));
+						result = checked(-Convert.ToDouble(value));
 						break;
 					case ExpressionType.Not:
-						if (values.First() is bool)
+						if (value is bool)
 						{
-							value = !Convert.ToBoolean(values.First());
+							result = !Convert.ToBoolean(value);
 						}
 						else
 						{
-							value = ~Convert.ToInt64(values.First());
+							result = ~Convert.ToInt64(value);
 						}
 						break;
 					//case ExpressionType.Quote:
-					//case ExpressionType.Convert:
-					//case ExpressionType.ConvertChecked:
-					//case ExpressionType.ArrayLength:
-					//case ExpressionType.TypeAs:
+					case ExpressionType.Convert:
+						result = Convert.ChangeType(value, u.Type, CultureInfo.InvariantCulture);
+						break;
+					case ExpressionType.ConvertChecked:
+						result = checked(Convert.ChangeType(value, u.Type, CultureInfo.InvariantCulture));
+						break;
+					case ExpressionType.ArrayLength:
+						result = ((object[])value).Length;
+						break;
+					case ExpressionType.TypeAs:
+						try
+						{
+							result = Convert.ChangeType(value, u.Type, CultureInfo.InvariantCulture);
+						}
+						catch (InvalidCastException)
+						{
+							result = null;
+						}
+						break;
 					default:
 						throw new ArgumentOutOfRangeException();
 				}
 			}
 
-			Type type = u.Operand.Type;
-			value = Convert.ChangeType(value, type, CultureInfo.InvariantCulture);
-			this.data.Push(value);
+			result = Convert.ChangeType(result, u.Type, CultureInfo.InvariantCulture);
+			this.data.Push(result);
 
 			return expression;
 		}
@@ -350,13 +364,25 @@
 		{
 			Expression expression = base.VisitNewArray(na);
 
-			Array arrayValues = this.GetValuesFromStack(na.Expressions.Count);
+			Array newArray;
 			Type type = na.Type.GetElementType();
 
-			Array array = Array.CreateInstance(type, arrayValues.Length);
-			Array.Copy(arrayValues, array, arrayValues.Length);
-			
-			this.data.Push(array);
+			switch(na.NodeType)
+			{
+				case ExpressionType.NewArrayBounds:
+					int length = (int)this.GetValueFromStack();
+					newArray = Array.CreateInstance(type, length);
+					break;
+				case ExpressionType.NewArrayInit:
+					Array arrayValues = this.GetValuesFromStack(na.Expressions.Count);
+					newArray = Array.CreateInstance(type, arrayValues.Length);
+					Array.Copy(arrayValues, newArray, arrayValues.Length);
+					break;
+				default:
+					throw new ArgumentOutOfRangeException();
+			}
+
+			this.data.Push(newArray);
 
 			return expression;
 		}

@@ -18,19 +18,19 @@
 			return func;
 		}
 
-		public static Func<T1, T2, TResult> Reflect<T1, T2, TResult>(this Expression<Func<T2, T2, TResult>> target)
+		public static Func<T1, T2, TResult> Reflect<T1, T2, TResult>(this Expression<Func<T1, T2, TResult>> target)
 		{
 			Func<T1, T2, TResult> func = (a, b) => (TResult)Execute(target, CreateArgs(target.Parameters, a, b));
 			return func;
 		}
 
-		public static Func<T1, T2, T3, TResult> Reflect<T1, T2, T3, TResult>(this Expression<Func<T2, T2, T3, TResult>> target)
+		public static Func<T1, T2, T3, TResult> Reflect<T1, T2, T3, TResult>(this Expression<Func<T1, T2, T3, TResult>> target)
 		{
 			Func<T1, T2, T3, TResult> func = (a, b, c) => (TResult)Execute(target, CreateArgs(target.Parameters, a, b, c));
 			return func;
 		}
 
-		public static Func<T1, T2, T3, T4, TResult> Reflect<T1, T2, T3, T4, TResult>(this Expression<Func<T2, T2, T3, T4, TResult>> target)
+		public static Func<T1, T2, T3, T4, TResult> Reflect<T1, T2, T3, T4, TResult>(this Expression<Func<T1, T2, T3, T4, TResult>> target)
 		{
 			Func<T1, T2, T3, T4, TResult> func = (a, b, c, d) => (TResult)Execute(target, CreateArgs(target.Parameters, a, b, c, d));
 			return func;

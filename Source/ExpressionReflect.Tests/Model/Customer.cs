@@ -69,6 +69,11 @@
 
 		public bool IsPremium { get; set; }
 
+		public object Object
+		{
+			get { return new object(); }
+		}
+
 		public int CalculateAge()
 		{
 			return AgeConstant;
