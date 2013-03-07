@@ -70,5 +70,20 @@
 		{
 			return this.Firstname + " " + this.Lastname;
 		}
+
+		public static int GetDefaultAge()
+		{
+			return AgeConstant;
+		}
+
+		public static int GetDefaultAge(int value)
+		{
+			return AgeConstant + value;
+		}
+
+		public static int GetDefaultAge(Customer customer)
+		{
+			return customer.Age + AgeConstant;
+		}
 	}
 }

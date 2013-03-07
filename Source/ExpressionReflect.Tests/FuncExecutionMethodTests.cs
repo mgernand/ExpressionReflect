@@ -268,6 +268,222 @@ namespace ExpressionReflect.Tests
 			reflectionResult.Should().Be("john doe");
 			reflectionResult.Should().Be(emitResult);
 		}
+
+		[Test]
+		public void ShouldCreateSimpleFunc_StaticMethodCall()
+		{
+			// Arrange
+			Customer customer = new Customer("John", "Doe");
+			Expression<Func<Customer, int>> expression = x => Customer.GetDefaultAge();
+			Console.WriteLine(expression.ToString());
+
+			// Act
+			Func<Customer, int> emit = expression.Compile();
+			Func<Customer, int> reflection = expression.Reflect();
+
+			int emitResult = emit.Invoke(customer);
+			int reflectionResult = reflection.Invoke(customer);
+
+			// Assert
+			emitResult.Should().Be(Customer.AgeConstant);
+			reflectionResult.Should().Be(Customer.AgeConstant);
+			reflectionResult.Should().Be(emitResult);
+		}
+
+		[Test]
+		public void ShouldCreateSimpleFunc_StaticMethodCall_Constant()
+		{
+			// Arrange
+			Customer customer = new Customer("John", "Doe");
+			Expression<Func<Customer, int>> expression = x => Customer.GetDefaultAge(20);
+			Console.WriteLine(expression.ToString());
+
+			// Act
+			Func<Customer, int> emit = expression.Compile();
+			Func<Customer, int> reflection = expression.Reflect();
+
+			int emitResult = emit.Invoke(customer);
+			int reflectionResult = reflection.Invoke(customer);
+
+			// Assert
+			emitResult.Should().Be(53);
+			reflectionResult.Should().Be(53);
+			reflectionResult.Should().Be(emitResult);
+		}
+
+		[Test]
+		public void ShouldCreateSimpleFunc_StaticMethodCall_Local()
+		{
+			// Arrange
+			Customer customer = new Customer("John", "Doe");
+			int value = 20;
+			Expression<Func<Customer, int>> expression = x => Customer.GetDefaultAge(value);
+			Console.WriteLine(expression.ToString());
+
+			// Act
+			Func<Customer, int> emit = expression.Compile();
+			Func<Customer, int> reflection = expression.Reflect();
+
+			int emitResult = emit.Invoke(customer);
+			int reflectionResult = reflection.Invoke(customer);
+
+			// Assert
+			emitResult.Should().Be(53);
+			reflectionResult.Should().Be(53);
+			reflectionResult.Should().Be(emitResult);
+		}
+
+		[Test]
+		public void ShouldCreateSimpleFunc_StaticMethodCall_Delegate()
+		{
+			// Arrange
+			Customer customer = new Customer("John", "Doe");
+			Func<int> value = () => 20;
+			Expression<Func<Customer, int>> expression = x => Customer.GetDefaultAge(value());
+			Console.WriteLine(expression.ToString());
+
+			// Act
+			Func<Customer, int> emit = expression.Compile();
+			Func<Customer, int> reflection = expression.Reflect();
+
+			int emitResult = emit.Invoke(customer);
+			int reflectionResult = reflection.Invoke(customer);
+
+			// Assert
+			emitResult.Should().Be(53);
+			reflectionResult.Should().Be(53);
+			reflectionResult.Should().Be(emitResult);
+		}
+
+		[Test]
+		public void ShouldCreateSimpleFunc_StaticMethodCall_ExpressionParameter()
+		{
+			// Arrange
+			Customer customer = new Customer("John", "Doe");
+			Expression<Func<Customer, int>> expression = x => Customer.GetDefaultAge(x);
+			Console.WriteLine(expression.ToString());
+
+			// Act
+			Func<Customer, int> emit = expression.Compile();
+			Func<Customer, int> reflection = expression.Reflect();
+
+			int emitResult = emit.Invoke(customer);
+			int reflectionResult = reflection.Invoke(customer);
+
+			// Assert
+			emitResult.Should().Be(66);
+			reflectionResult.Should().Be(66);
+			reflectionResult.Should().Be(emitResult);
+		}
+
+		///////////////////
+
+		[Test]
+		public void ShouldCreateSimpleFunc_ExtMethodCall()
+		{
+			// Arrange
+			Customer customer = new Customer("John", "Doe");
+			Expression<Func<Customer, int>> expression = x => x.GetDefaultAgeEx();
+			Console.WriteLine(expression.ToString());
+
+			// Act
+			Func<Customer, int> emit = expression.Compile();
+			Func<Customer, int> reflection = expression.Reflect();
+
+			int emitResult = emit.Invoke(customer);
+			int reflectionResult = reflection.Invoke(customer);
+
+			// Assert
+			emitResult.Should().Be(Customer.AgeConstant);
+			reflectionResult.Should().Be(Customer.AgeConstant);
+			reflectionResult.Should().Be(emitResult);
+		}
+
+		[Test]
+		public void ShouldCreateSimpleFunc_ExtMethodCall_Constant()
+		{
+			// Arrange
+			Customer customer = new Customer("John", "Doe");
+			Expression<Func<Customer, int>> expression = x => x.GetDefaultAgeEx(20);
+			Console.WriteLine(expression.ToString());
+
+			// Act
+			Func<Customer, int> emit = expression.Compile();
+			Func<Customer, int> reflection = expression.Reflect();
+
+			int emitResult = emit.Invoke(customer);
+			int reflectionResult = reflection.Invoke(customer);
+
+			// Assert
+			emitResult.Should().Be(53);
+			reflectionResult.Should().Be(53);
+			reflectionResult.Should().Be(emitResult);
+		}
+
+		[Test]
+		public void ShouldCreateSimpleFunc_ExtMethodCall_Local()
+		{
+			// Arrange
+			Customer customer = new Customer("John", "Doe");
+			int value = 20;
+			Expression<Func<Customer, int>> expression = x => x.GetDefaultAgeEx(value);
+			Console.WriteLine(expression.ToString());
+
+			// Act
+			Func<Customer, int> emit = expression.Compile();
+			Func<Customer, int> reflection = expression.Reflect();
+
+			int emitResult = emit.Invoke(customer);
+			int reflectionResult = reflection.Invoke(customer);
+
+			// Assert
+			emitResult.Should().Be(53);
+			reflectionResult.Should().Be(53);
+			reflectionResult.Should().Be(emitResult);
+		}
+
+		[Test]
+		public void ShouldCreateSimpleFunc_ExtMethodCall_Delegate()
+		{
+			// Arrange
+			Customer customer = new Customer("John", "Doe");
+			Func<int> value = () => 20;
+			Expression<Func<Customer, int>> expression = x => x.GetDefaultAgeEx(value());
+			Console.WriteLine(expression.ToString());
+
+			// Act
+			Func<Customer, int> emit = expression.Compile();
+			Func<Customer, int> reflection = expression.Reflect();
+
+			int emitResult = emit.Invoke(customer);
+			int reflectionResult = reflection.Invoke(customer);
+
+			// Assert
+			emitResult.Should().Be(53);
+			reflectionResult.Should().Be(53);
+			reflectionResult.Should().Be(emitResult);
+		}
+
+		[Test]
+		public void ShouldCreateSimpleFunc_ExtMethodCall_ExpressionParameter()
+		{
+			// Arrange
+			Customer customer = new Customer("John", "Doe");
+			Expression<Func<Customer, int>> expression = x => x.GetDefaultAgeEx();
+			Console.WriteLine(expression.ToString());
+
+			// Act
+			Func<Customer, int> emit = expression.Compile();
+			Func<Customer, int> reflection = expression.Reflect();
+
+			int emitResult = emit.Invoke(customer);
+			int reflectionResult = reflection.Invoke(customer);
+
+			// Assert
+			emitResult.Should().Be(66);
+			reflectionResult.Should().Be(66);
+			reflectionResult.Should().Be(emitResult);
+		}
 	}
 }
 // ReSharper restore InconsistentNaming

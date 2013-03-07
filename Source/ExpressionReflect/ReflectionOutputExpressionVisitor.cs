@@ -55,6 +55,7 @@
 			return base.VisitMemberAccess(m);
 		}
 
+		// Todo: Mix expression parameters with constant or other parameters
 		protected override Expression VisitMethodCall(MethodCallExpression m)
 		{
 			Expression methodCallExpression = base.VisitMethodCall(m);
@@ -63,6 +64,7 @@
 			object[] parameterValues = this.GetValuesFromStack(m.Arguments);
 			MethodInfo methodInfo = m.Method;
 
+			// Todo: What about extension methods/static method calls
 			object value = null;
 			Expression expression = m.Object;
 			if (expression is ParameterExpression) // Method call on expression variable (f.e x.DoSomething())
