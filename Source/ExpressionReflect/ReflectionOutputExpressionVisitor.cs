@@ -37,15 +37,26 @@
 
 		protected override Expression VisitParameter(ParameterExpression p)
 		{
+			Expression expression = base.VisitParameter(p);
+
 			object argument = this.args[p.Name];
 			this.evaluatedData.Push(argument);
-
-			return base.VisitParameter(p); ;
+			
+			return expression;
 		}
 
 		protected override Expression VisitMemberAccess(MemberExpression m)
 		{
+			// Note: Call base.VisitMemberAccess(m) late for local variables special case.
+			Expression expression = null;
 			MemberInfo memberInfo = m.Member;
+
+			// Call Visit early if declaring type is not compiler generated.
+			bool callVisit = !memberInfo.DeclaringType.IsCompilerGenerated();
+			if (callVisit)
+			{
+				expression = base.VisitMemberAccess(m);
+			}
 
 			if (memberInfo is PropertyInfo)
 			{
@@ -64,7 +75,7 @@
 				}
 			}
 
-			return base.VisitMemberAccess(m);;
+			return expression ?? base.VisitMemberAccess(m);
 		}
 
 		// Todo: Mix expression parameters with constant or other parameters
