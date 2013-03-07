@@ -178,7 +178,7 @@ Supported features
 * Constant expressions
 * Local delegates
 * Local delegates with parameters (local and constant, binary expression)
-* Binary expressions (almost complete)
+* Binary expressions (almost complete) including 'is' operator
 * Unary expressions (almost complete)
 * Array access
 * Array creation (simple arrays)

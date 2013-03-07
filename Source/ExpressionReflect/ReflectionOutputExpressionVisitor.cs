@@ -242,6 +242,19 @@
 			return binaryExpression;
 		}
 
+		protected override Expression VisitTypeIs(TypeBinaryExpression b)
+		{
+			Expression expression = base.VisitTypeIs(b);
+
+			object target = this.GetValueFromStack();
+			Type isType = b.TypeOperand;
+
+			bool value = isType.IsInstanceOfType(target);
+			this.data.Push(value);
+
+			return expression;
+		}
+
 		protected override Expression VisitUnary(UnaryExpression u)
 		{
 			Expression unaryExpression = base.VisitUnary(u);
