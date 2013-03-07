@@ -2,6 +2,7 @@
 {
 	using System;
 	using System.Collections.Generic;
+	using System.Collections.ObjectModel;
 	using System.Globalization;
 	using System.Linq;
 	using System.Linq.Expressions;
@@ -124,6 +125,11 @@
 					NewExpression parameter = (NewExpression)expression;
 					target = this.GetValueFromStack(parameter.Type);
 				}
+				else if(expression is InvocationExpression) // Teh method was called on a delegate
+				{
+					InvocationExpression parameter = (InvocationExpression)expression;
+					target = this.GetValueFromStack(parameter.Type);
+				}
 			}
 
 			// If expression is null the call is static, so the target must and will be null.
@@ -132,6 +138,31 @@
 			this.evaluatedData.Push(value);
 			
 			return methodCallExpression;
+		}
+
+		protected override Expression VisitInvocation(InvocationExpression iv)
+		{
+			Expression expression = base.VisitInvocation(iv);
+
+			object value = null;
+
+			if(iv.Expression is MemberExpression)
+			{
+				// Use the delegate on the stack. The constant expression visitor pushed it there.
+				value = this.evaluatedData.Pop();
+
+				if (value is Delegate)
+				{
+					Delegate del = (Delegate)value;
+					ParameterInfo[] parameterInfos = del.Method.GetParameters();
+					object[] parameterValues = GetValuesFromStack(parameterInfos.Length);
+					value = del.DynamicInvoke(parameterValues);
+				}
+			}
+
+			this.evaluatedData.Push(value);
+
+			return expression;
 		}
 
 		protected override NewExpression VisitNew(NewExpression nex)
@@ -272,7 +303,7 @@
 			object value = null;
 
 			bool isCompilerGenerated = c.Type.IsCompilerGenerated();
-			if(isCompilerGenerated) // Special case for local variables
+			if (isCompilerGenerated) // Special case for local variables
 			{
 				string memberName = this.localVariableNames.Pop();
 				MemberInfo memberInfo = c.Type.GetMember(memberName).First();
@@ -280,13 +311,13 @@
 				FieldInfo fieldInfo = (FieldInfo)memberInfo;
 				value = fieldInfo.GetValue(c.Value);
 
-				if(value is Delegate)
-				{
-					Delegate del = (Delegate)value;
-					ParameterInfo[] parameterInfos = del.Method.GetParameters();
-					object[] parameterValues = GetValuesFromStack(parameterInfos.Length);
-					value = del.DynamicInvoke(parameterValues);
-				}
+				//if (value is Delegate)
+				//{
+				//	Delegate del = (Delegate)value;
+				//	ParameterInfo[] parameterInfos = del.Method.GetParameters();
+				//	object[] parameterValues = GetValuesFromStack(parameterInfos.Length);
+				//	value = del.DynamicInvoke(parameterValues);
+				//}
 			}
 			else
 			{
@@ -296,6 +327,21 @@
 			this.evaluatedData.Push(value);
 
 			return base.VisitConstant(c);
+		}
+
+		protected override Expression VisitNewArray(NewArrayExpression na)
+		{
+			Expression expression = base.VisitNewArray(na);
+
+			Array arrayValues = this.GetValuesFromStack(na.Expressions);
+			Type type = na.Type.GetElementType();
+
+			Array array = Array.CreateInstance(type, arrayValues.Length);
+			Array.Copy(arrayValues, array, arrayValues.Length);
+			
+			this.evaluatedData.Push(array);
+
+			return expression;
 		}
 
 		private object[] GetValuesFromStack(IEnumerable<Expression> arguments)

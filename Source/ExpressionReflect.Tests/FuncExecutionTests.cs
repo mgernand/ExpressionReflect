@@ -290,7 +290,7 @@ namespace ExpressionReflect.Tests
 		}
 
 		[Test]
-		public void ShouldCreateSimpleFunc_ArrayAccess_Delegate_CallingMethod()
+		public void ShouldCreateSimpleFunc_Delegate_CallingMethod()
 		{
 			// Arrange
 			Customer customer = new Customer("John", "Doe");
@@ -308,6 +308,28 @@ namespace ExpressionReflect.Tests
 			// Assert
 			emitResult.Should().Be("hello");
 			reflectionResult.Should().Be("hello");
+			reflectionResult.Should().Be(emitResult);
+		}
+
+		[Test]
+		public void ShouldCreateSimpleFunc_Delegate_CallingMethod_WithParameter()
+		{
+			// Arrange
+			Customer customer = new Customer("John", "Doe");
+			Func<string, string> func = x => "hello " + x;
+			Expression<Func<Customer, string>> expression = x => func("test").Trim('h', 't');
+			Console.WriteLine(expression.ToString());
+
+			// Act
+			Func<Customer, string> emit = expression.Compile();
+			Func<Customer, string> reflection = expression.Reflect();
+
+			string emitResult = emit.Invoke(customer);
+			string reflectionResult = reflection.Invoke(customer);
+
+			// Assert
+			emitResult.Should().Be("ello tes");
+			reflectionResult.Should().Be("ello tes");
 			reflectionResult.Should().Be(emitResult);
 		}
 	}

@@ -181,3 +181,4 @@ Supported features
 * Binary expressions (most)
 * Unary expressions (most)
 * Array access
+* Array creation
