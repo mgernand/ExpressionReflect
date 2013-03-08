@@ -42,6 +42,7 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="ExpressionEvaluationException.cs" />
     <Compile Include="ExpressionExtensions.cs" />
     <Compile Include="ExpressionVisitor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

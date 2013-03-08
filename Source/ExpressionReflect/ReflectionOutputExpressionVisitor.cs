@@ -24,7 +24,7 @@
 		/// <summary>
 		/// The entry point for the evaluation.
 		/// </summary>
-		/// <param name="expression">The expression to evaludate.</param>
+		/// <param name="expression">The expression to evaluate.</param>
 		/// <returns>The result of the expression.</returns>
 		internal object GetResult(Expression expression)
 		{
@@ -32,11 +32,11 @@
 
 			if (this.data.Count > 1)
 			{
-				throw new ArgumentException("The result stack contained too much elements.");
+				throw new ExpressionEvaluationException("The result stack contained too much elements.");
 			}
 			if (this.data.Count < 1)
 			{
-				throw new ArgumentException("The result stack contained too few elements.");
+				throw new ExpressionEvaluationException("The result stack contained too few elements.");
 			}
 
 			object value = this.GetValueFromStack();
