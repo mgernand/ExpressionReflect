@@ -14,7 +14,6 @@
 	{
 		private readonly IDictionary<string, object> args;
 		private readonly Stack<object> data = new Stack<object>();
-		private readonly Stack<string> localVariableNames = new Stack<string>(); 
 
 		internal ReflectionOutputExpressionVisitor(IDictionary<string, object> args)
 		{
@@ -32,11 +31,11 @@
 
 			if (this.data.Count > 1)
 			{
-				throw new ExpressionEvaluationException("The result stack contained too much elements.");
+				throw new ExpressionEvaluationException("The stack contained too much elements.");
 			}
 			if (this.data.Count < 1)
 			{
-				throw new ExpressionEvaluationException("The result stack contained too few elements.");
+				throw new ExpressionEvaluationException("The stack contained too few elements.");
 			}
 
 			object value = this.GetValueFromStack();
@@ -80,7 +79,7 @@
 				bool isCompilerGenerated = memberInfo.DeclaringType.IsCompilerGenerated();
 				if (isCompilerGenerated) // Special case for local variables
 				{
-					localVariableNames.Push(memberInfo.Name);
+					data.Push(memberInfo.Name);
 				}
 			}
 
@@ -344,7 +343,7 @@
 			bool isCompilerGenerated = c.Type.IsCompilerGenerated();
 			if (isCompilerGenerated) // Special case for local variables
 			{
-				string memberName = this.localVariableNames.Pop();
+				string memberName = (string)this.GetValueFromStack();
 				MemberInfo memberInfo = c.Type.GetMember(memberName).First();
 
 				FieldInfo fieldInfo = (FieldInfo)memberInfo;
