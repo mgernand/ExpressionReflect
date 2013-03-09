@@ -130,7 +130,7 @@
 			if (memberInfo is PropertyInfo)
 			{
 				object target = this.GetValueFromStack();
-				PropertyInfo propertyInfo = (PropertyInfo)memberInfo;	
+				PropertyInfo propertyInfo = (PropertyInfo)memberInfo;
 				object value = propertyInfo.GetValue(target, null);
 				this.data.Push(value);
 			}
@@ -139,7 +139,7 @@
 				bool isCompilerGenerated = memberInfo.DeclaringType.IsCompilerGenerated();
 				if (isCompilerGenerated) // Special case for local variables
 				{
-					data.Push(memberInfo.Name);
+					this.data.Push(memberInfo.Name);
 				}
 			}
 
