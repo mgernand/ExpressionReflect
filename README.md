@@ -172,6 +172,8 @@ Supported features
 ------------------
 
 * `Func<T, TResult>`
+* `Action` und `Action<T>`
+* `Predicate<T>`
 * Property getters including indexers
 * Method calls with mixed parameters
 * Constructor invocations with mixed parameters
@@ -186,4 +188,4 @@ Supported features
 * Object initializers (objects, lists, dictionaries)
 * Ternary conditionals
 
-All this features can be combined to for more complex expressions.
+All this features can be combined to more complex expressions.

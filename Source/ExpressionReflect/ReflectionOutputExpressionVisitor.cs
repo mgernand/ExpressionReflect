@@ -12,7 +12,7 @@
 	/// </summary>
 	internal sealed class ReflectionOutputExpressionVisitor : ExpressionVisitor
 	{
-		private readonly IDictionary<string, object> args;
+		private readonly IDictionary<string, object> args = new Dictionary<string, object>();
 		private readonly Stack<object> data = new Stack<object>();
 
 		internal ReflectionOutputExpressionVisitor(IDictionary<string, object> args)
@@ -20,25 +20,45 @@
 			this.args = args;
 		}
 
+		public ReflectionOutputExpressionVisitor(Expression expression, object[] values)
+		{
+			this.Initialize(expression, values);
+			this.Visit(expression);
+		}
+
+		private void Initialize(Expression expression, object[] values)
+		{
+			int index = 0;
+			foreach (ParameterExpression parameter in ((LambdaExpression)expression).Parameters)
+			{
+				string name = parameter.Name;
+				this.args.Add(name, values[index++]);
+			}
+		}
+
 		/// <summary>
 		/// The entry point for the evaluation.
 		/// </summary>
-		/// <param name="expression">The expression to evaluate.</param>
+		/// <param name="returnsValue">Flag, indicating if the expression returns a value. The default is <c>true</c>.</param>
 		/// <returns>The result of the expression.</returns>
-		internal object GetResult(Expression expression)
+		internal object Execute(bool returnsValue = true)
 		{
-			this.Visit(expression);
-
 			if (this.data.Count > 1)
 			{
 				throw new ExpressionEvaluationException("The stack contained too much elements.");
 			}
-			if (this.data.Count < 1)
+			if (returnsValue && this.data.Count < 1)
 			{
 				throw new ExpressionEvaluationException("The stack contained too few elements.");
 			}
 
-			object value = this.GetValueFromStack();
+			object value = null;
+
+			if(returnsValue)
+			{
+				value = this.GetValueFromStack();
+			}
+			
 			return value;
 		}
 
@@ -463,6 +483,10 @@
 			return parameterValues.Reverse().ToArray();
 		}
 
+		/// <summary>
+		/// Gets a single value from the stack.
+		/// </summary>
+		/// <returns>The element.</returns>
 		private object GetValueFromStack()
 		{
 			object parameterValue = this.data.Pop();

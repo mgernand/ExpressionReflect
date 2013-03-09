@@ -42,9 +42,12 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="ActionExtensions.cs" />
     <Compile Include="ExpressionEvaluationException.cs" />
-    <Compile Include="ExpressionExtensions.cs" />
+    <Compile Include="ExpressionReflector.cs" />
+    <Compile Include="FuncExtensions.cs" />
     <Compile Include="ExpressionVisitor.cs" />
+    <Compile Include="PredicateExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReflectionOutputExpressionVisitor.cs" />
     <Compile Include="TypeExtensions.cs" />
