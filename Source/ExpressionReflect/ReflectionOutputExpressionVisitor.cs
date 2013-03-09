@@ -1,6 +1,7 @@
 ﻿namespace ExpressionReflect
 {
 	using System;
+	using System.Collections;
 	using System.Collections.Generic;
 	using System.Globalization;
 	using System.Linq;
@@ -12,28 +13,19 @@
 	/// </summary>
 	internal sealed class ReflectionOutputExpressionVisitor : ExpressionVisitor
 	{
+		private readonly Expression targetExpression;
+		private readonly object[] passedArgumentValues;
+		private bool isInitialized = false;
+
 		private readonly IDictionary<string, object> args = new Dictionary<string, object>();
 		private readonly Stack<object> data = new Stack<object>();
 
-		internal ReflectionOutputExpressionVisitor(IDictionary<string, object> args)
+		public ReflectionOutputExpressionVisitor(Expression targetExpression, object[] passedArgumentValues)
 		{
-			this.args = args;
-		}
+			this.targetExpression = targetExpression;
+			this.passedArgumentValues = passedArgumentValues;
 
-		public ReflectionOutputExpressionVisitor(Expression expression, object[] values)
-		{
-			this.Initialize(expression, values);
-			this.Visit(expression);
-		}
-
-		private void Initialize(Expression expression, object[] values)
-		{
-			int index = 0;
-			foreach (ParameterExpression parameter in ((LambdaExpression)expression).Parameters)
-			{
-				string name = parameter.Name;
-				this.args.Add(name, values[index++]);
-			}
+			this.Visit(targetExpression);
 		}
 
 		/// <summary>
@@ -60,6 +52,23 @@
 			}
 			
 			return value;
+		}
+
+		protected override Expression VisitLambda(LambdaExpression lambda)
+		{
+			if(!this.isInitialized)
+			{
+				this.Initialize();
+			}
+			else
+			{
+				Type delegateType = lambda.Type;
+				object value = this.GetValueFromStack();
+				this.Initialize(lambda, new object[] { value });
+				// Todo: Create delegate for lambda and push it on the stack...
+			}
+
+			return base.VisitLambda(lambda);
 		}
 
 		protected override Expression VisitParameter(ParameterExpression p)
@@ -491,6 +500,22 @@
 		{
 			object parameterValue = this.data.Pop();
 			return parameterValue;
+		}
+
+		private void Initialize()
+		{
+			this.Initialize((LambdaExpression)this.targetExpression, this.passedArgumentValues);
+			this.isInitialized = true;
+		}
+
+		private void Initialize(LambdaExpression lambdaExpression, object[] parameterValues)
+		{
+			int index = 0;
+			foreach (ParameterExpression parameter in lambdaExpression.Parameters)
+			{
+				string name = parameter.Name;
+				this.args[name] = parameterValues[index++];
+			}
 		}
 	}
 }
