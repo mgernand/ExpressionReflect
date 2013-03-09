@@ -20,8 +20,7 @@ to compiled expressions, so it should only be used with simple expressions.
 Usage
 -----
 
-The usage is fairly simple. It's just an extension method on a expression. Only expressions of `Func<>` are supported 
-at the moment.
+The usage is fairly simple. It's just an extension method on a expression.
 
 ```csharp
 Expression<Func<Customer, string>> expression = x => x.Firstname;
@@ -29,14 +28,17 @@ Func<Customer, string> reflection = expression.Reflect();
 string result = reflection.Invoke(customer);
 ```
 
-`Reflect()` will return a delegate that will invoke the reflection evaluation internally.
+The extension method `Reflect()` will return a delegate that will execute the reflection-based expression evaluation
+internally.
 
 What is supported?
 ------------------
 
 The following built-in delegates are supported at the moment:
 
-* `Func<T, TResult>`
+* `Func<T, TResult>` (all variations)
+* `Action` und `Action<T>` (all variations)
+* `Predicate<T>`
 
 The following expression types are supported at the moment:
 
