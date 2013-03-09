@@ -3,6 +3,7 @@ namespace ExpressionReflect.Tests
 {
 	using System;
 	using System.Collections.Generic;
+	using System.Linq;
 	using System.Linq.Expressions;
 	using ExpressionReflect.Tests.Model;
 	using FluentAssertions;
@@ -451,6 +452,29 @@ namespace ExpressionReflect.Tests
 			// Assert
 			emitResult.Length.Should().Be(12);
 			reflectionResult.Length.Should().Be(12);
+			reflectionResult.Length.Should().Be(emitResult.Length);
+		}
+
+		[Test]
+		public void ShouldCreateSimpleFunc_Linq()
+		{
+			// Arrange
+			IList<Customer> list = new List<Customer>();
+			list.Add(new Customer("John", "Doe"));
+			list.Add(new Customer("Jane", "Doe"));
+			Expression<Func<IList<Customer>, Customer[]>> expression = a => a.Where(x => x.Lastname == "Doe").OrderBy(x => x.Firstname).ToArray();
+			Console.WriteLine(expression.ToString());
+
+			// Act
+			Func<IList<Customer>, Customer[]> emit = expression.Compile();
+			Func<IList<Customer>, Customer[]> reflection = expression.Reflect();
+
+			Customer[] emitResult = emit.Invoke(list);
+			Customer[] reflectionResult = reflection.Invoke(list);
+
+			// Assert
+			emitResult.Length.Should().Be(2);
+			reflectionResult.Length.Should().Be(2);
 			reflectionResult.Length.Should().Be(emitResult.Length);
 		}
 	}

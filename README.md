@@ -53,7 +53,6 @@ x => x.Firstname.ToLower();
 ```
 
 * Method call with return value
-```csharp
 x => x.CalculateAge()
 ```
 
