@@ -230,7 +230,10 @@ namespace ExpressionReflect.Tests
 		{
 			// Arrange
 			Customer customer = new Customer("John", "Doe");
-			string[] array = new string[] { "One", "Two" };
+			string[] array = new string[]
+			{
+				"One", "Two"
+			};
 			Expression<Func<Customer, string>> expression = x => array[0];
 			Console.WriteLine(expression.ToString());
 
@@ -252,7 +255,10 @@ namespace ExpressionReflect.Tests
 		{
 			// Arrange
 			Customer customer = new Customer("John", "Doe");
-			Func<string[]> func = () => new string[] { "One", "Two" };
+			Func<string[]> func = () => new string[]
+			{
+				"One", "Two"
+			};
 			Expression<Func<Customer, string>> expression = x => func()[0];
 			Console.WriteLine(expression.ToString());
 
@@ -274,7 +280,10 @@ namespace ExpressionReflect.Tests
 		{
 			// Arrange
 			Customer customer = new Customer("John", "Doe");
-			Func<string[]> func = () => new string[] { "One", "Two" };
+			Func<string[]> func = () => new string[]
+			{
+				"One", "Two"
+			};
 			Expression<Func<Customer, string>> expression = x => func.Invoke()[0];
 			Console.WriteLine(expression.ToString());
 
@@ -342,7 +351,7 @@ namespace ExpressionReflect.Tests
 			Customer customer = new Customer("John", "Doe");
 			Expression<Func<Customer, Customer>> expression = x => new Customer
 			{
-				Firstname = x.Firstname, 
+				Firstname = x.Firstname,
 				Lastname = x.Lastname
 			};
 			Console.WriteLine(expression.ToString());
@@ -368,7 +377,8 @@ namespace ExpressionReflect.Tests
 			Customer customer = new Customer("John", "Doe");
 			Expression<Func<Customer, IList<string>>> expression = x => new List<string>
 			{
-				"Hello", "World"
+				"Hello",
+				"World"
 			};
 			Console.WriteLine(expression.ToString());
 
@@ -391,11 +401,15 @@ namespace ExpressionReflect.Tests
 		{
 			// Arrange
 			Customer customer = new Customer("John", "Doe");
-			Expression<Func<Customer, IDictionary<string, string>>> expression = 
+			Expression<Func<Customer, IDictionary<string, string>>> expression =
 				x => new Dictionary<string, string>
 				{
-					{ "1", "Hello" },
-					{ "2", "World" }
+					{
+						"1", "Hello"
+					},
+					{
+						"2", "World"
+					}
 				};
 			Console.WriteLine(expression.ToString());
 
@@ -418,7 +432,10 @@ namespace ExpressionReflect.Tests
 		{
 			// Arrange
 			Customer customer = new Customer("John", "Doe");
-			Expression<Func<Customer, string[]>> expression = x => new string[] { "1", "2" };
+			Expression<Func<Customer, string[]>> expression = x => new string[]
+			{
+				"1", "2"
+			};
 			Console.WriteLine(expression.ToString());
 
 			// Act
@@ -456,12 +473,13 @@ namespace ExpressionReflect.Tests
 		}
 
 		[Test]
-		public void ShouldCreateSimpleFunc_LinqSimple()
+		public void ShouldCreateSimpleFunc_NestedExpression_ReferenceParameter_ValueResult()
 		{
 			// Arrange
 			IList<Customer> list = new List<Customer>();
 			list.Add(new Customer("John", "Doe"));
 			list.Add(new Customer("Jane", "Doe"));
+
 			Expression<Func<IList<Customer>, Customer>> expression = a => a.FirstOrDefault(x => x.Lastname == "Doe");
 			Console.WriteLine(expression.ToString());
 
@@ -478,27 +496,74 @@ namespace ExpressionReflect.Tests
 		}
 
 		[Test]
-		public void ShouldCreateSimpleFunc_LinqComplex()
+		public void ShouldCreateSimpleFunc_NestedExpression_ValueParameter_ValueResult()
+		{
+			// Arrange
+			IList<int> list = new List<int>();
+			list.Add(50);
+			list.Add(100);
+
+			Expression<Func<IList<int>, int>> expression = a => a.FirstOrDefault(x => x == 50);
+			Console.WriteLine(expression.ToString());
+
+			// Act
+			Func<IList<int>, int> emit = expression.Compile();
+			Func<IList<int>, int> reflection = expression.Reflect();
+
+			int emitResult = emit.Invoke(list);
+			int reflectionResult = reflection.Invoke(list);
+
+			// Assert
+			emitResult.Should().Be(50);
+			reflectionResult.Should().Be(50);
+		}
+
+		[Test]
+		public void ShouldCreateSimpleFunc_NestedExpression_ValueParameter_CustomStructResult()
+		{
+			// Arrange
+			IList<CustomStruct> list = new List<CustomStruct>();
+			list.Add(new CustomStruct(50));
+			list.Add(new CustomStruct(100));
+
+			Expression<Func<IList<CustomStruct>, CustomStruct>> expression = a => a.FirstOrDefault(x => x.Value == 50);
+			Console.WriteLine(expression.ToString());
+
+			// Act
+			Func<IList<CustomStruct>, CustomStruct> emit = expression.Compile();
+			Func<IList<CustomStruct>, CustomStruct> reflection = expression.Reflect();
+
+			CustomStruct emitResult = emit.Invoke(list);
+			CustomStruct reflectionResult = reflection.Invoke(list);
+
+			// Assert
+			emitResult.Value.Should().Be(50);
+			reflectionResult.Value.Should().Be(50);
+		}
+
+		[Test]
+		public void ShouldCreateSimpleFunc_NestedExpression_TwoParameters()
 		{
 			// Arrange
 			IList<Customer> list = new List<Customer>();
 			list.Add(new Customer("John", "Doe"));
 			list.Add(new Customer("Jane", "Doe"));
-			Expression<Func<IList<Customer>, Customer[]>> expression = a => a.Where(x => x.Lastname == "Doe").OrderBy(x => x.Firstname).ToArray();
+
+			Expression<Func<IList<Customer>, Customer>> expression = a => a.FirstOrDefaultCustom((x, y) => x.Lastname == "Doe");
 			Console.WriteLine(expression.ToString());
 
 			// Act
-			Func<IList<Customer>, Customer[]> emit = expression.Compile();
-			Func<IList<Customer>, Customer[]> reflection = expression.Reflect();
+			Func<IList<Customer>, Customer> emit = expression.Compile();
+			Func<IList<Customer>, Customer> reflection = expression.Reflect();
 
-			Customer[] emitResult = emit.Invoke(list);
-			Customer[] reflectionResult = reflection.Invoke(list);
+			Customer emitResult = emit.Invoke(list);
+			Customer reflectionResult = reflection.Invoke(list);
 
 			// Assert
-			emitResult.Length.Should().Be(2);
-			reflectionResult.Length.Should().Be(2);
-			reflectionResult.Length.Should().Be(emitResult.Length);
+			emitResult.Firstname.Should().Be("John");
+			reflectionResult.Firstname.Should().Be("John");
 		}
 	}
 }
+
 // ReSharper restore InconsistentNaming

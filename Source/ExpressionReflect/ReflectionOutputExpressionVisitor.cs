@@ -1,7 +1,6 @@
 ﻿namespace ExpressionReflect
 {
 	using System;
-	using System.Collections;
 	using System.Collections.Generic;
 	using System.Globalization;
 	using System.Linq;
@@ -13,12 +12,13 @@
 	/// </summary>
 	internal sealed class ReflectionOutputExpressionVisitor : ExpressionVisitor
 	{
+		private IDictionary<string, object> args = new Dictionary<string, object>();
+		private readonly Stack<object> data = new Stack<object>();
+		private readonly Stack<LambdaExpression> nestedLambdas = new Stack<LambdaExpression>();
+
 		private readonly Expression targetExpression;
 		private readonly object[] passedArgumentValues;
 		private bool isInitialized = false;
-
-		private readonly IDictionary<string, object> args = new Dictionary<string, object>();
-		private readonly Stack<object> data = new Stack<object>();
 
 		public ReflectionOutputExpressionVisitor(Expression targetExpression, object[] passedArgumentValues)
 		{
@@ -56,19 +56,50 @@
 
 		protected override Expression VisitLambda(LambdaExpression lambda)
 		{
+			Expression expression = null;
+
 			if(!this.isInitialized)
 			{
 				this.Initialize();
+				expression = base.VisitLambda(lambda);
 			}
 			else
 			{
-				Type delegateType = lambda.Type;
-				object value = this.GetValueFromStack();
-				this.Initialize(lambda, new object[] { value });
-				// Todo: Create delegate for lambda and push it on the stack...
+				Delegate @delegate = null;
+
+				string methodName = null;
+
+				Type type = lambda.Type;
+				if (type.IsFunc())
+				{
+					methodName = "Func";
+				}
+				else if(type.IsAction())
+				{
+					methodName = "Action";
+				}
+				else if(type.IsPredicate())
+				{
+					methodName = "Predicate";
+				}
+
+				if(string.IsNullOrWhiteSpace(methodName))
+				{
+					throw new ExpressionEvaluationException(string.Format("No wrapper method available for delegate type '{0}'", type.Name));
+				}
+
+				Type[] genericArguments = type.GetGenericArguments();
+				MethodInfo methodInfo = this.FindMethod(methodName, genericArguments);
+				@delegate = Delegate.CreateDelegate(type, this, methodInfo);
+
+				// Push lambda expression onto the stack. The expression will be used
+				// inside the wrapper method for executing the lambda.
+				this.nestedLambdas.Push(lambda);
+
+				expression = this.VisitConstant(Expression.Constant(@delegate));
 			}
 
-			return base.VisitLambda(lambda);
+			return expression;
 		}
 
 		protected override Expression VisitParameter(ParameterExpression p)
@@ -98,9 +129,9 @@
 
 			if (memberInfo is PropertyInfo)
 			{
-				PropertyInfo propertyInfo = (PropertyInfo)memberInfo;
-
-				object value = propertyInfo.GetValue(this.GetValueFromStack(), null);
+				object target = this.GetValueFromStack();
+				PropertyInfo propertyInfo = (PropertyInfo)memberInfo;	
+				object value = propertyInfo.GetValue(target, null);
 				this.data.Push(value);
 			}
 			if(memberInfo is FieldInfo)
@@ -132,7 +163,13 @@
 			object value = methodInfo.Invoke(target, parameterValues);
 
 			this.data.Push(value);
-			
+
+			// Remove the nested lambda expression from stack after method execution.
+			if(this.nestedLambdas.Any())
+			{
+				this.nestedLambdas.Pop();
+			}
+
 			return expression;
 		}
 
@@ -217,10 +254,10 @@
 						value = Convert.ToDouble(values.First()) % Convert.ToDouble(values.Last());
 						break;
 					case ExpressionType.Equal:
-						value = values.First() == values.Last();
+						value = values.First().Equals(values.Last());
 						break;
 					case ExpressionType.NotEqual:
-						value = values.First() != values.Last();
+						value = !(values.First().Equals(values.Last()));
 						break;
 					case ExpressionType.And:
 						value = Convert.ToBoolean(values.First()) & Convert.ToBoolean(values.Last());
@@ -504,18 +541,99 @@
 
 		private void Initialize()
 		{
-			this.Initialize((LambdaExpression)this.targetExpression, this.passedArgumentValues);
+			this.args = InitializeArgs((LambdaExpression)this.targetExpression, this.passedArgumentValues);
 			this.isInitialized = true;
 		}
 
-		private void Initialize(LambdaExpression lambdaExpression, object[] parameterValues)
+		private static IDictionary<string, object> InitializeArgs(LambdaExpression lambdaExpression, object[] parameterValues)
 		{
+			IDictionary<string, object> arguments = new Dictionary<string, object>();
+
 			int index = 0;
 			foreach (ParameterExpression parameter in lambdaExpression.Parameters)
 			{
 				string name = parameter.Name;
-				this.args[name] = parameterValues[index++];
+				arguments[name] = parameterValues[index++];
 			}
+
+			return arguments;
+		}
+
+		private MethodInfo FindMethod(string name, Type[] genericArguments)
+		{
+			MethodInfo result = null;
+
+			IEnumerable<MethodInfo> methods = this.GetType().GetMethods(BindingFlags.NonPublic | BindingFlags.Instance).Where(x => x.Name == name);
+			foreach (MethodInfo method in methods)
+			{
+				// create the generic method
+				if (method.GetGenericArguments().Count() == genericArguments.Count())
+				{
+					result = method.IsGenericMethod 
+						? method.MakeGenericMethod(genericArguments) 
+						: method;
+					break;
+				}
+			}
+
+			return result;
+		}
+
+		private TResult Func<T, TResult>(T arg)
+		{
+			return (TResult)this.ExecuteReflector(arg);
+		}
+
+		private TResult Func<T1, T2, TResult>(T1 arg1, T2 arg2)
+		{
+			return (TResult)this.ExecuteReflector(arg1, arg2);
+		}
+
+		private TResult Func<T1, T2, T3, TResult>(T1 arg1, T2 arg2, T3 arg3)
+		{
+			return (TResult)this.ExecuteReflector(arg1, arg2, arg3);
+		}
+
+		private TResult Func<T1, T2, T3, T4, TResult>(T1 arg1, T2 arg2, T3 arg3, T4 arg4)
+		{
+			return (TResult)this.ExecuteReflector(arg1, arg2, arg3, arg4);
+		}
+
+		private void Action()
+		{
+			this.ExecuteReflector();
+		}
+
+		private void Action<T>(T arg)
+		{
+			this.ExecuteReflector(arg);
+		}
+
+		private void Action<T1, T2>(T1 arg1, T2 arg2)
+		{
+			this.ExecuteReflector(arg1, arg2);
+		}
+
+		private void Action<T1, T2, T3>(T1 arg1, T2 arg2, T3 arg3)
+		{
+			this.ExecuteReflector(arg1, arg2, arg3);
+		}
+
+		private void Action<T1, T2, T3, T4>(T1 arg1, T2 arg2, T3 arg3, T4 arg4)
+		{
+			this.ExecuteReflector(arg1, arg2, arg3, arg4);
+		}
+
+		private bool Predicate<T>(T arg)
+		{
+			return (bool)this.ExecuteReflector(arg);
+		}
+
+		private object ExecuteReflector(params object[] arguments)
+		{
+			LambdaExpression expression = this.nestedLambdas.Peek();
+			object result = ExpressionReflector.Execute(expression, arguments);
+			return result;
 		}
 	}
 }

@@ -47,7 +47,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ActionExecutionTests.cs" />
     <Compile Include="ConditionalTests.cs" />
+    <Compile Include="Model\CustomStruct.cs" />
     <Compile Include="FuncExecutionConstructorTests.cs" />
     <Compile Include="FuncExecutionMethodTests.cs" />
     <Compile Include="FuncExecutionTests.cs" />
@@ -56,6 +58,7 @@
     <Compile Include="Model\NameIndex.cs" />
     <Compile Include="BinaryOperatorTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Model\TestExtensionMethods.cs" />
     <Compile Include="UnaryOperatorTests.cs" />
   </ItemGroup>
   <ItemGroup>
