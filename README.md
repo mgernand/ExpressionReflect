@@ -188,5 +188,6 @@ Supported features
 * Array creation (simple arrays)
 * Object initializers (objects, lists, dictionaries)
 * Ternary conditionals
+* Nested expressions (f.e. LINQ extension methods: `x => x.FirstOrDefault(y.Name == "John")`)
 
 All this features can be combined to more complex expressions.
