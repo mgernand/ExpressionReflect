@@ -456,7 +456,29 @@ namespace ExpressionReflect.Tests
 		}
 
 		[Test]
-		public void ShouldCreateSimpleFunc_Linq()
+		public void ShouldCreateSimpleFunc_LinqSimple()
+		{
+			// Arrange
+			IList<Customer> list = new List<Customer>();
+			list.Add(new Customer("John", "Doe"));
+			list.Add(new Customer("Jane", "Doe"));
+			Expression<Func<IList<Customer>, Customer>> expression = a => a.FirstOrDefault(x => x.Lastname == "Doe");
+			Console.WriteLine(expression.ToString());
+
+			// Act
+			Func<IList<Customer>, Customer> emit = expression.Compile();
+			Func<IList<Customer>, Customer> reflection = expression.Reflect();
+
+			Customer emitResult = emit.Invoke(list);
+			Customer reflectionResult = reflection.Invoke(list);
+
+			// Assert
+			emitResult.Firstname.Should().Be("John");
+			reflectionResult.Firstname.Should().Be("John");
+		}
+
+		[Test]
+		public void ShouldCreateSimpleFunc_LinqComplex()
 		{
 			// Arrange
 			IList<Customer> list = new List<Customer>();
