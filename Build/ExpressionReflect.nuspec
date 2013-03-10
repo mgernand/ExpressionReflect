@@ -5,7 +5,7 @@
 		<version>0.0.0</version>
 		<authors>Matthias Gernand</authors>
 		<owners>Matthias Gernand</owners>
-		<licenseUrl></licenseUrl>
+		<licenseUrl>https://github.com/mgernand/ExpressionReflect/blob/master/Source/License.txt</licenseUrl>
 		<projectUrl>https://github.com/mgernand/ExpressionReflect</projectUrl>
 		<!--<iconUrl></iconUrl>-->
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
