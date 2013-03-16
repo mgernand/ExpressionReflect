@@ -176,6 +176,7 @@ Supported features
 * `Action` und `Action<T>`
 * `Predicate<T>`
 * Property getters including indexers
+* Field access
 * Method calls with mixed parameters
 * Constructor invocations with mixed parameters
 * Local variables

@@ -8,6 +8,7 @@
 		public const int AgeConstant = 33;
 
 		private readonly int calculationValue;
+		public string Field;
 
 		public Customer()
 		{

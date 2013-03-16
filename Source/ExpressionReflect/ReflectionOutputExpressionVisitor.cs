@@ -137,9 +137,16 @@
 			if(memberInfo is FieldInfo)
 			{
 				bool isCompilerGenerated = memberInfo.DeclaringType.IsCompilerGenerated();
-				if (isCompilerGenerated) // Special case for local variables
+				if(isCompilerGenerated) // Special case for local variables
 				{
 					this.data.Push(memberInfo.Name);
+				}
+				else
+				{
+					object target = this.GetValueFromStack();
+					FieldInfo fieldInfo = (FieldInfo)memberInfo;
+					object value = fieldInfo.GetValue(target);
+					this.data.Push(value);
 				}
 			}
 
@@ -472,6 +479,12 @@
 					PropertyInfo propertyInfo = (PropertyInfo)memberInfo;
 					object value = values[index];
 					propertyInfo.SetValue(target, value, null);
+				}
+				else if(memberInfo is FieldInfo)
+				{
+					FieldInfo fieldInfo = (FieldInfo)memberInfo;
+					object value = values[index];
+					fieldInfo.SetValue(target, value);
 				}
 			}
 

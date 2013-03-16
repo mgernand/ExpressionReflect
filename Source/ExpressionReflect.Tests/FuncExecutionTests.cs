@@ -563,6 +563,51 @@ namespace ExpressionReflect.Tests
 			emitResult.Firstname.Should().Be("John");
 			reflectionResult.Firstname.Should().Be("John");
 		}
+
+		[Test]
+		public void ShouldCreateSimpleFunc_Field()
+		{
+			// Arrange
+			Customer customer = new Customer("John", "Doe");
+			customer.Field = "SoylentGreen";
+			Expression<Func<Customer, string>> expression = x => x.Field;
+			Console.WriteLine(expression.ToString());
+
+			// Act
+			Func<Customer, string> emit = expression.Compile();
+			Func<Customer, string> reflection = expression.Reflect();
+
+			string emitResult = emit.Invoke(customer);
+			string reflectionResult = reflection.Invoke(customer);
+
+			// Assert
+			emitResult.Should().Be("SoylentGreen");
+			reflectionResult.Should().Be("SoylentGreen");
+			reflectionResult.Should().Be(emitResult);
+		}
+
+		[Test]
+		public void ShouldCreateSimpleFunc_ObjectInitializer_WithField()
+		{
+			// Arrange
+			Customer customer = new Customer("John", "Doe");
+			Expression<Func<Customer, Customer>> expression = x => new Customer
+			{
+				Field = "SoylentGreen",
+			};
+			Console.WriteLine(expression.ToString());
+
+			// Act
+			Func<Customer, Customer> emit = expression.Compile();
+			Func<Customer, Customer> reflection = expression.Reflect();
+
+			Customer emitResult = emit.Invoke(customer);
+			Customer reflectionResult = reflection.Invoke(customer);
+
+			// Assert
+			emitResult.Field.Should().Be("SoylentGreen");
+			reflectionResult.Field.Should().Be("SoylentGreen");
+		}
 	}
 }
 
