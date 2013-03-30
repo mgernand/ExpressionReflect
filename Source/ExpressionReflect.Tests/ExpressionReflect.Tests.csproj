@@ -49,6 +49,7 @@
   <ItemGroup>
     <Compile Include="ActionExecutionTests.cs" />
     <Compile Include="ConditionalTests.cs" />
+    <Compile Include="EvaluatorTests.cs" />
     <Compile Include="Model\CustomStruct.cs" />
     <Compile Include="FuncExecutionConstructorTests.cs" />
     <Compile Include="FuncExecutionMethodTests.cs" />

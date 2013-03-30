@@ -44,8 +44,9 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="ActionExtensions.cs" />
+    <Compile Include="Evaluator.cs" />
     <Compile Include="ExpressionEvaluationException.cs" />
-    <Compile Include="ExpressionReflector.cs" />
+    <Compile Include="ExpressionExtensions.cs" />
     <Compile Include="FuncExtensions.cs" />
     <Compile Include="ExpressionVisitor.cs" />
     <Compile Include="PredicateExtensions.cs" />

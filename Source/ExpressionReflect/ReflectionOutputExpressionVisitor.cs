@@ -58,7 +58,7 @@
 		{
 			Expression expression = null;
 
-			if(!this.isInitialized)
+			if (!this.isInitialized)
 			{
 				this.Initialize();
 				expression = base.VisitLambda(lambda);
@@ -74,16 +74,16 @@
 				{
 					methodName = "Func";
 				}
-				else if(type.IsAction())
+				else if (type.IsAction())
 				{
 					methodName = "Action";
 				}
-				else if(type.IsPredicate())
+				else if (type.IsPredicate())
 				{
 					methodName = "Predicate";
 				}
 
-				if(string.IsNullOrWhiteSpace(methodName))
+				if (string.IsNullOrWhiteSpace(methodName))
 				{
 					throw new ExpressionEvaluationException(string.Format("No wrapper method available for delegate type '{0}'", type.Name));
 				}
@@ -645,7 +645,7 @@
 		private object ExecuteReflector(params object[] arguments)
 		{
 			LambdaExpression expression = this.nestedLambdas.Peek();
-			object result = ExpressionReflector.Execute(expression, arguments);
+			object result = expression.Execute(arguments);
 			return result;
 		}
 	}

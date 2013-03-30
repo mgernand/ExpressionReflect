@@ -2,9 +2,9 @@
 {
 	using System.Linq.Expressions;
 
-	internal static class ExpressionReflector
+	public static class ExpressionExtensions
 	{
-		internal static object Execute(Expression expression, params object[] values)
+		public static object Execute(this Expression expression, params object[] values)
 		{
 			ReflectionOutputExpressionVisitor visitor = new ReflectionOutputExpressionVisitor(expression, values);
 			object result = visitor.Execute();

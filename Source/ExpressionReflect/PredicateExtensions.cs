@@ -7,7 +7,7 @@
 	{
 		public static Predicate<T> Reflect<T>(this Expression<Predicate<T>> target)
 		{
-			Predicate<T> predicate = x => (bool)ExpressionReflector.Execute(target, x);
+			Predicate<T> predicate = x => (bool)target.Execute(x);
 			return predicate;
 		}
 	}

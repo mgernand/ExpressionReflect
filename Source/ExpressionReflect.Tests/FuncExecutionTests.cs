@@ -328,7 +328,8 @@ namespace ExpressionReflect.Tests
 			// Arrange
 			Customer customer = new Customer("John", "Doe");
 			Func<string, string> func = x => "hello " + x;
-			Expression<Func<Customer, string>> expression = x => func("test").Trim('h', 't');
+			string s = "test";
+			Expression<Func<Customer, string>> expression = x => func(s).Trim('h', 't');
 			Console.WriteLine(expression.ToString());
 
 			// Act
