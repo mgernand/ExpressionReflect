@@ -6,9 +6,6 @@ namespace ExpressionReflect
 	using System.Collections.ObjectModel;
 	using System.Linq.Expressions;
 
-	/// <summary>
-	/// Note: http://msdn.microsoft.com/en-us/library/bb882521%28v=vs.90%29.aspx
-	/// </summary>
 	internal abstract class ExpressionVisitor
 	{
 		protected virtual Expression Visit(Expression exp)
