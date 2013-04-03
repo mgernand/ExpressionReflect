@@ -9,8 +9,8 @@
 		<projectUrl>https://github.com/mgernand/ExpressionReflect</projectUrl>
 		<!--<iconUrl></iconUrl>-->
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
-		<description>Provides the ability to "compile" expressions to delegates without using Reflection.Emit but only using reflection.</description>
-		<summary></summary>
+		<description>A reflection-based expression executor.</description>
+		<summary>Provides the ability to convert expressions to delegates without using Reflection.Emit. When this delegates are invoked the underlying expression is executed using using reflection.</summary>
 		<language>en-US</language>
 		<tags>expressions reflection compile monotouch xamarin ios</tags>
 		<dependencies>
@@ -22,9 +22,8 @@
 	</metadata>
 	<files>
 		<!-- Add nuget package files -->
-		<!-- Todo: Portable -->
-		<file src="ExpressionReflect.dll" target="lib\net45\ExpressionReflect.dll" />
-		<file src="ExpressionReflect.xml" target="lib\net45\ExpressionReflect.xml" />
-		<file src="ExpressionReflect.pdb" target="lib\net45\ExpressionReflect.pdb" />
+		<file src="ExpressionReflect.dll" target="lib\portable-win+net45+MonoAndroid16+MonoMac40+MonoTouch40+sl40+wp71\ExpressionReflect.dll" />
+		<file src="ExpressionReflect.xml" target="lib\portable-win+net45+MonoAndroid16+MonoMac40+MonoTouch40+sl40+wp71\ExpressionReflect.xml" />
+		<file src="ExpressionReflect.pdb" target="lib\portable-win+net45+MonoAndroid16+MonoMac40+MonoTouch40+sl40+wp71\ExpressionReflect.pdb" />
 	</files>
 </package>
