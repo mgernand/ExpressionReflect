@@ -8,9 +8,9 @@
 	using System.Reflection;
 
 	/// <summary>
-	/// An expression visit that translates the expression tree into reflection calls.
+	/// An expression visitor that translates the expression tree to reflection calls.
 	/// </summary>
-	internal sealed class ReflectionOutputExpressionVisitor : ExpressionVisitor
+	internal sealed class ExpressionReflectionExecutor : ExpressionVisitor
 	{
 		private IDictionary<string, object> args = new Dictionary<string, object>();
 		private readonly Stack<object> data = new Stack<object>();
@@ -20,7 +20,7 @@
 		private readonly object[] passedArgumentValues;
 		private bool isInitialized = false;
 
-		public ReflectionOutputExpressionVisitor(Expression targetExpression, object[] passedArgumentValues)
+		public ExpressionReflectionExecutor(Expression targetExpression, object[] passedArgumentValues)
 		{
 			this.targetExpression = targetExpression;
 			this.passedArgumentValues = passedArgumentValues;
@@ -37,11 +37,11 @@
 		{
 			if (this.data.Count > 1)
 			{
-				throw new ExpressionEvaluationException("The stack contained too much elements.");
+				throw new ExpressionExecutionException("The stack contained too much elements.");
 			}
 			if (returnsValue && this.data.Count < 1)
 			{
-				throw new ExpressionEvaluationException("The stack contained too few elements.");
+				throw new ExpressionExecutionException("The stack contained too few elements.");
 			}
 
 			object value = null;
@@ -85,7 +85,7 @@
 
 				if (string.IsNullOrWhiteSpace(methodName))
 				{
-					throw new ExpressionEvaluationException(string.Format("No wrapper method available for delegate type '{0}'", type.Name));
+					throw new ExpressionExecutionException(string.Format("No wrapper method available for delegate type '{0}'", type.Name));
 				}
 
 				Type[] genericArguments = type.GetGenericArguments();

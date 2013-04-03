@@ -6,7 +6,7 @@
 	{
 		public static object Execute(this Expression expression, params object[] values)
 		{
-			ReflectionOutputExpressionVisitor visitor = new ReflectionOutputExpressionVisitor(expression, values);
+			ExpressionReflectionExecutor visitor = new ExpressionReflectionExecutor(expression, values);
 			object result = visitor.Execute();
 			return result;
 		}
