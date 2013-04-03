@@ -39,7 +39,7 @@ namespace ExpressionReflect.Tests
 			Expression<Func<Customer, bool>> expresion = x => x.Firstname == str;
 
 			// Act
-			string expressionString = Evaluator.PartialEval(expresion).ToString();
+			string expressionString = expresion.PartialEval().ToString();
 			Console.WriteLine(expressionString);
 
 			// Assert
@@ -54,7 +54,7 @@ namespace ExpressionReflect.Tests
 			Expression<Func<Customer, bool>> expresion = x => x.Firstname == func();
 
 			// Act
-			string expressionString = Evaluator.PartialEval(expresion).ToString();
+			string expressionString = expresion.PartialEval().ToString();
 			Console.WriteLine(expressionString);
 
 			// Assert
@@ -69,7 +69,7 @@ namespace ExpressionReflect.Tests
 			Expression<Func<Customer, bool>> expresion = x => x.Firstname == func(5);
 
 			// Act
-			string expressionString = Evaluator.PartialEval(expresion).ToString();
+			string expressionString = expresion.PartialEval().ToString();
 			Console.WriteLine(expressionString);
 
 			// Assert
@@ -85,7 +85,7 @@ namespace ExpressionReflect.Tests
 			Expression<Func<Customer, bool>> expresion = x => x.Firstname == func(i);
 
 			// Act
-			string expressionString = Evaluator.PartialEval(expresion).ToString();
+			string expressionString = expresion.PartialEval().ToString();
 			Console.WriteLine(expressionString);
 
 			// Assert
@@ -101,7 +101,7 @@ namespace ExpressionReflect.Tests
 			Expression<Func<Customer, bool>> expresion = x => x.Firstname == func(i());
 
 			// Act
-			string expressionString = Evaluator.PartialEval(expresion).ToString();
+			string expressionString = expresion.PartialEval().ToString();
 			Console.WriteLine(expressionString);
 
 			// Assert
@@ -115,7 +115,7 @@ namespace ExpressionReflect.Tests
 			Expression<Func<Customer, bool>> expresion = x => x.Firstname == this.GetString();
 
 			// Act
-			string expressionString = Evaluator.PartialEval(expresion).ToString();
+			string expressionString = expresion.PartialEval().ToString();
 			Console.WriteLine(expressionString);
 
 			// Assert
@@ -129,7 +129,7 @@ namespace ExpressionReflect.Tests
 			Expression<Func<Customer, bool>> expresion = x => x.Firstname == GetStringStatic();
 
 			// Act
-			string expressionString = Evaluator.PartialEval(expresion).ToString();
+			string expressionString = expresion.PartialEval().ToString();
 			Console.WriteLine(expressionString);
 
 			// Assert
@@ -143,7 +143,7 @@ namespace ExpressionReflect.Tests
 			Expression<Func<Customer, bool>> expresion = x => x.Firstname == this.GetString(5);
 
 			// Act
-			string expressionString = Evaluator.PartialEval(expresion).ToString();
+			string expressionString = expresion.PartialEval().ToString();
 			Console.WriteLine(expressionString);
 
 			// Assert
@@ -157,7 +157,7 @@ namespace ExpressionReflect.Tests
 			Expression<Func<Customer, bool>> expresion = x => x.Firstname == GetStringStatic(5);
 
 			// Act
-			string expressionString = Evaluator.PartialEval(expresion).ToString();
+			string expressionString = expresion.PartialEval().ToString();
 			Console.WriteLine(expressionString);
 
 			// Assert
@@ -172,7 +172,7 @@ namespace ExpressionReflect.Tests
 			Expression<Func<Customer, bool>> expresion = x => x.Firstname == this.GetString(i);
 
 			// Act
-			string expressionString = Evaluator.PartialEval(expresion).ToString();
+			string expressionString = expresion.PartialEval().ToString();
 			Console.WriteLine(expressionString);
 
 			// Assert
@@ -187,7 +187,7 @@ namespace ExpressionReflect.Tests
 			Expression<Func<Customer, bool>> expresion = x => x.Firstname == GetStringStatic(i);
 
 			// Act
-			string expressionString = Evaluator.PartialEval(expresion).ToString();
+			string expressionString = expresion.PartialEval().ToString();
 			Console.WriteLine(expressionString);
 
 			// Assert
@@ -202,7 +202,7 @@ namespace ExpressionReflect.Tests
 			Expression<Func<Customer, bool>> expresion = x => x.Firstname == this.GetString(i());
 
 			// Act
-			string expressionString = Evaluator.PartialEval(expresion).ToString();
+			string expressionString = expresion.PartialEval().ToString();
 			Console.WriteLine(expressionString);
 
 			// Assert
@@ -217,7 +217,7 @@ namespace ExpressionReflect.Tests
 			Expression<Func<Customer, bool>> expresion = x => x.Firstname == GetStringStatic(i());
 
 			// Act
-			string expressionString = Evaluator.PartialEval(expresion).ToString();
+			string expressionString = expresion.PartialEval().ToString();
 			Console.WriteLine(expressionString);
 
 			// Assert
@@ -232,7 +232,7 @@ namespace ExpressionReflect.Tests
 			Expression<Func<Customer, bool>> expresion = x => x.Firstname == func(x.Lastname);
 
 			// Act
-			string expressionString = Evaluator.PartialEval(expresion).ToString();
+			string expressionString = expresion.PartialEval().ToString();
 			Console.WriteLine(expressionString);
 
 			// Assert

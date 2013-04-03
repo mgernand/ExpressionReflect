@@ -12,7 +12,6 @@
 		/// </summary>
 		/// <remarks>
 		/// From http://msdn.microsoft.com/en-us/library/bb546158.aspx
-		/// Copyright notice http://msdn.microsoft.com/en-gb/cc300389.aspx#O
 		/// </remarks>
 		public static class Evaluator
 		{
