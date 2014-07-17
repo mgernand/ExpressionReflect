@@ -129,8 +129,12 @@
 
 			if (memberInfo is PropertyInfo)
 			{
-				object target = this.GetValueFromStack();
-				PropertyInfo propertyInfo = (PropertyInfo)memberInfo;
+			    object target = null;
+                if (!((PropertyInfo)memberInfo).GetGetMethod().IsStatic)
+			    {
+			        target = this.GetValueFromStack();
+			    }
+			    PropertyInfo propertyInfo = (PropertyInfo)memberInfo;
 				object value = propertyInfo.GetValue(target, null);
 				this.data.Push(value);
 			}
@@ -143,7 +147,11 @@
 				}
 				else
 				{
-					object target = this.GetValueFromStack();
+				    object target = null;
+                    if (!((FieldInfo)memberInfo).IsStatic)
+				    {
+                        target = this.GetValueFromStack();    
+				    }                    
 					FieldInfo fieldInfo = (FieldInfo)memberInfo;
 					object value = fieldInfo.GetValue(target);
 					this.data.Push(value);
