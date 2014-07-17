@@ -269,7 +269,7 @@
 						value = Convert.ToDouble(values.First()) % Convert.ToDouble(values.Last());
 						break;
 					case ExpressionType.Equal:
-						value = values.First().Equals(values.Last());
+				        value = Equals(values.First(), values.Last());                        
 						break;
 					case ExpressionType.NotEqual:
 						value = !(values.First().Equals(values.Last()));
