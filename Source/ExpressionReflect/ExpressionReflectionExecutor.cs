@@ -55,14 +55,14 @@
 			return value;
 		}
 
-		protected override Expression VisitLambda(LambdaExpression lambda)
+		protected override Expression VisitLambda<T>(Expression<T> node)
 		{
 						
 				Delegate @delegate = null;
 
 				string methodName = null;
 
-				Type type = lambda.Type;
+				Type type = node.Type;
 				if (type.IsFunc())
 				{
 					methodName = "Func";
@@ -81,7 +81,7 @@
 					throw new ExpressionExecutionException(string.Format("No wrapper method available for delegate type '{0}'", type.Name));
 				}
 
-				var executor = new ExpressionReflectionExecutor(lambda);
+				var executor = new ExpressionReflectionExecutor(node);
 
 				Type[] genericArguments = type.GetGenericArguments();
 				MethodInfo methodInfo = this.FindMethod(methodName, genericArguments);
@@ -102,21 +102,11 @@
 			return expression;
 		}
 
-		protected override Expression VisitMemberAccess(MemberExpression m)
+		protected override Expression VisitMember(MemberExpression node)
 		{
-			// Call base.VisitMemberAccess(m) late for local variables special case.
-			Expression expression = null;
-			MemberInfo memberInfo = m.Member;
-
-			// Call Visit early if declaring type is not compiler generated.
-			// If the declaring type is compiler generated we need to wait
-			// with the call to Visit until after the variable name discovery.
-			bool callVisit = !memberInfo.DeclaringType.IsCompilerGenerated();
-			if (callVisit)
-			{
-				expression = base.VisitMemberAccess(m);
-			}
-
+			Expression expression = base.VisitMember(node);
+			MemberInfo memberInfo = node.Member;
+			
 			if (memberInfo is PropertyInfo)
 			{
 			    object target = null;
@@ -130,25 +120,17 @@
 			}
 			if(memberInfo is FieldInfo)
 			{
-				bool isCompilerGenerated = memberInfo.DeclaringType.IsCompilerGenerated();
-				if(isCompilerGenerated) // Special case for local variables
+				object target = null;
+                if (!((FieldInfo)memberInfo).IsStatic)
 				{
-					this.data.Push(memberInfo.Name);
-				}
-				else
-				{
-				    object target = null;
-                    if (!((FieldInfo)memberInfo).IsStatic)
-				    {
-                        target = this.GetValueFromStack();    
-				    }                    
-					FieldInfo fieldInfo = (FieldInfo)memberInfo;
-					object value = fieldInfo.GetValue(target);
-					this.data.Push(value);
-				}
+                    target = this.GetValueFromStack();    
+				}                    
+				FieldInfo fieldInfo = (FieldInfo)memberInfo;
+				object value = fieldInfo.GetValue(target);
+				this.data.Push(value);
 			}
 
-			return expression ?? base.VisitMemberAccess(m);
+			return expression;
 		}
 
 		protected override Expression VisitMethodCall(MethodCallExpression m)
@@ -178,23 +160,23 @@
 			return expression;
 		}
 
-		protected override Expression VisitInvocation(InvocationExpression iv)
+		protected override Expression VisitInvocation(InvocationExpression node)
 		{
-			Expression expression = base.VisitInvocation(iv);
+			Expression expression = base.VisitInvocation(node);
 
 			object value = null;
 
-			if(iv.Expression is MemberExpression)
+			if(node.Expression is MemberExpression)
 			{
+				object[] arguments = this.GetValuesFromStack(node.Arguments.Count);
+				
 				// Use the delegate on the stack. The constant expression visitor pushed it there.
 				value = this.GetValueFromStack();
 
 				if (value is Delegate)
 				{
-					Delegate del = (Delegate)value;
-					ParameterInfo[] parameterInfos = del.Method.GetParameters();
-					object[] parameterValues = GetValuesFromStack(parameterInfos.Length);
-					value = del.DynamicInvoke(parameterValues);
+					Delegate del = (Delegate)value;										
+					value = del.DynamicInvoke(arguments);
 				}
 			}
 
@@ -203,9 +185,9 @@
 			return expression;
 		}
 
-		protected override NewExpression VisitNew(NewExpression nex)
+		protected override Expression VisitNew(NewExpression nex)
 		{
-			NewExpression expression = base.VisitNew(nex);
+			Expression expression = base.VisitNew(nex);
 
 			ConstructorInfo constructorInfo = nex.Constructor;
 			object[] parameterValues = this.GetValuesFromStack(nex.Arguments.Count);
@@ -316,10 +298,10 @@
 			return expression;
 		}
 
-		protected override Expression VisitTypeIs(TypeBinaryExpression b)
+		protected override Expression VisitTypeBinary(TypeBinaryExpression b)
 		{
-			Expression expression = base.VisitTypeIs(b);
-
+			Expression expression = base.VisitTypeBinary(b);
+			
 			object target = this.GetValueFromStack();
 			Type isType = b.TypeOperand;
 
@@ -408,25 +390,8 @@
 		}
 
 		protected override Expression VisitConstant(ConstantExpression c)
-		{
-			object value;
-
-			bool isCompilerGenerated = c.Type.IsCompilerGenerated();
-			if (isCompilerGenerated) // Special case for local variables
-			{
-				string memberName = (string)this.GetValueFromStack();
-				MemberInfo memberInfo = c.Type.GetMember(memberName).First();
-
-				FieldInfo fieldInfo = (FieldInfo)memberInfo;
-				value = fieldInfo.GetValue(c.Value);
-			}
-			else
-			{
-				value = c.Value;
-			}
-
-			this.data.Push(value);
-
+		{			
+			this.data.Push(c.Value);
 			return base.VisitConstant(c);
 		}
 
