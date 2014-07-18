@@ -129,12 +129,12 @@
 
 			if (memberInfo is PropertyInfo)
 			{
-			    object target = null;
-                if (!((PropertyInfo)memberInfo).GetGetMethod().IsStatic)
-			    {
-			        target = this.GetValueFromStack();
-			    }
-			    PropertyInfo propertyInfo = (PropertyInfo)memberInfo;
+				object target = null;
+				if (!((PropertyInfo)memberInfo).GetGetMethod().IsStatic)
+				{
+					target = this.GetValueFromStack();
+				}
+				PropertyInfo propertyInfo = (PropertyInfo)memberInfo;
 				object value = propertyInfo.GetValue(target, null);
 				this.data.Push(value);
 			}
@@ -147,11 +147,11 @@
 				}
 				else
 				{
-				    object target = null;
-                    if (!((FieldInfo)memberInfo).IsStatic)
-				    {
-                        target = this.GetValueFromStack();    
-				    }                    
+					object target = null;
+					if (!((FieldInfo)memberInfo).IsStatic)
+					{
+						target = this.GetValueFromStack();    
+					}                    
 					FieldInfo fieldInfo = (FieldInfo)memberInfo;
 					object value = fieldInfo.GetValue(target);
 					this.data.Push(value);
@@ -269,7 +269,7 @@
 						value = Convert.ToDouble(values.First()) % Convert.ToDouble(values.Last());
 						break;
 					case ExpressionType.Equal:
-				        value = Equals(values.First(), values.Last());                        
+						value = Equals(values.First(), values.Last());                        
 						break;
 					case ExpressionType.NotEqual:
 						value = !(values.First().Equals(values.Last()));
