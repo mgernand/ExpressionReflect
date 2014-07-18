@@ -3,7 +3,6 @@ namespace ExpressionReflect.Tests
 {
 	using System;
 	using System.Linq.Expressions;
-	using ExpressionReflect.Fluxera.Storage;
 	using ExpressionReflect.Tests.Model;
 	using FluentAssertions;
 	using NUnit.Framework;
