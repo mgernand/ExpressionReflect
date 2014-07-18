@@ -1,133 +1,129 @@
 ﻿namespace ExpressionReflect
 {
-	namespace Fluxera.Storage
+	using System;
+	using System.Collections.Generic;
+	using System.Linq.Expressions;
+
+	/// <summary>
+	/// Enables the partial evaluation of queries.
+	/// </summary>
+	/// <remarks>
+	/// From http://msdn.microsoft.com/en-us/library/bb546158.aspx
+	/// </remarks>
+	public static class Evaluator
 	{
-		using System;
-		using System.Collections.Generic;
-		using System.Linq.Expressions;
-		using ExpressionReflect;
+		/// <summary>
+		/// Performs evaluation & replacement of independent sub-trees
+		/// </summary>
+		/// <param name="expression">The root of the expression tree.</param>
+		/// <returns>A new tree with sub-trees evaluated and replaced.</returns>
+		public static Expression PartialEval(this Expression expression)
+		{
+			return PartialEval(expression, Evaluator.CanBeEvaluatedLocally);
+		}
 
 		/// <summary>
-		/// Enables the partial evaluation of queries.
+		/// Performs evaluation & replacement of independent sub-trees
 		/// </summary>
-		/// <remarks>
-		/// From http://msdn.microsoft.com/en-us/library/bb546158.aspx
-		/// </remarks>
-		public static class Evaluator
+		/// <param name="expression">The root of the expression tree.</param>
+		/// <param name="fnCanBeEvaluated">A function that decides whether a given expression node can be part of the local function.</param>
+		/// <returns>A new tree with sub-trees evaluated and replaced.</returns>
+		public static Expression PartialEval(this Expression expression, Func<Expression, bool> fnCanBeEvaluated)
 		{
-			/// <summary>
-			/// Performs evaluation & replacement of independent sub-trees
-			/// </summary>
-			/// <param name="expression">The root of the expression tree.</param>
-			/// <returns>A new tree with sub-trees evaluated and replaced.</returns>
-			public static Expression PartialEval(this Expression expression)
+			return new SubtreeEvaluator(new Nominator(fnCanBeEvaluated).Nominate(expression)).Eval(expression);
+		}
+
+		private static bool CanBeEvaluatedLocally(Expression expression)
+		{
+			return expression.NodeType != ExpressionType.Parameter;
+		}
+
+		/// <summary>
+		/// Evaluates & replaces sub-trees when first candidate is reached (top-down)
+		/// </summary>
+		private class SubtreeEvaluator : ExpressionVisitor
+		{
+			private readonly IDictionary<Expression, Expression> candidates;
+
+			internal SubtreeEvaluator(IDictionary<Expression, Expression> candidates)
 			{
-				return PartialEval(expression, Evaluator.CanBeEvaluatedLocally);
+				this.candidates = candidates;
 			}
 
-			/// <summary>
-			/// Performs evaluation & replacement of independent sub-trees
-			/// </summary>
-			/// <param name="expression">The root of the expression tree.</param>
-			/// <param name="fnCanBeEvaluated">A function that decides whether a given expression node can be part of the local function.</param>
-			/// <returns>A new tree with sub-trees evaluated and replaced.</returns>
-			public static Expression PartialEval(this Expression expression, Func<Expression, bool> fnCanBeEvaluated)
+			internal Expression Eval(Expression exp)
 			{
-				return new SubtreeEvaluator(new Nominator(fnCanBeEvaluated).Nominate(expression)).Eval(expression);
+				return this.Visit(exp);
 			}
 
-			private static bool CanBeEvaluatedLocally(Expression expression)
+			protected override Expression Visit(Expression exp)
 			{
-				return expression.NodeType != ExpressionType.Parameter;
+				if (exp == null)
+				{
+					return null;
+				}
+				if (this.candidates.ContainsKey(exp))
+				{
+					return this.Evaluate(exp);
+				}
+				return base.Visit(exp);
 			}
 
-			/// <summary>
-			/// Evaluates & replaces sub-trees when first candidate is reached (top-down)
-			/// </summary>
-			private class SubtreeEvaluator : ExpressionVisitor
+			private Expression Evaluate(Expression e)
 			{
-				private readonly IDictionary<Expression, Expression> candidates;
-
-				internal SubtreeEvaluator(IDictionary<Expression, Expression> candidates)
+				if (e.NodeType == ExpressionType.Constant)
 				{
-					this.candidates = candidates;
+					return e;
 				}
 
-				internal Expression Eval(Expression exp)
-				{
-					return this.Visit(exp);
-				}
+				LambdaExpression lambda = Expression.Lambda(e);
+				object value = lambda.Execute();
+				return Expression.Constant(value, e.Type);
+			}
+		}
 
-				protected override Expression Visit(Expression exp)
-				{
-					if (exp == null)
-					{
-						return null;
-					}
-					if (this.candidates.ContainsKey(exp))
-					{
-						return this.Evaluate(exp);
-					}
-					return base.Visit(exp);
-				}
+		/// <summary>
+		/// Performs bottom-up analysis to determine which nodes can possibly
+		/// be part of an evaluated sub-tree.
+		/// </summary>
+		private class Nominator : ExpressionVisitor
+		{
+			private readonly Func<Expression, bool> fnCanBeEvaluated;
+			private IDictionary<Expression, Expression> candidates;
+			private bool cannotBeEvaluated;
 
-				private Expression Evaluate(Expression e)
-				{
-					if (e.NodeType == ExpressionType.Constant)
-					{
-						return e;
-					}
-
-					LambdaExpression lambda = Expression.Lambda(e);
-					object value = lambda.Execute();
-					return Expression.Constant(value, e.Type);
-				}
+			internal Nominator(Func<Expression, bool> fnCanBeEvaluated)
+			{
+				this.fnCanBeEvaluated = fnCanBeEvaluated;
 			}
 
-			/// <summary>
-			/// Performs bottom-up analysis to determine which nodes can possibly
-			/// be part of an evaluated sub-tree.
-			/// </summary>
-			class Nominator : ExpressionVisitor
+			internal IDictionary<Expression, Expression> Nominate(Expression expression)
 			{
-				private readonly Func<Expression, bool> fnCanBeEvaluated;
-				private IDictionary<Expression, Expression> candidates;
-				private bool cannotBeEvaluated;
+				this.candidates = new Dictionary<Expression, Expression>();
+				this.Visit(expression);
+				return this.candidates;
+			}
 
-				internal Nominator(Func<Expression, bool> fnCanBeEvaluated)
+			protected override Expression Visit(Expression expression)
+			{
+				if (expression != null)
 				{
-					this.fnCanBeEvaluated = fnCanBeEvaluated;
-				}
-
-				internal IDictionary<Expression, Expression> Nominate(Expression expression)
-				{
-					this.candidates = new Dictionary<Expression, Expression>();
-					this.Visit(expression);
-					return this.candidates;
-				}
-
-				protected override Expression Visit(Expression expression)
-				{
-					if (expression != null)
+					bool saveCannotBeEvaluated = this.cannotBeEvaluated;
+					this.cannotBeEvaluated = false;
+					base.Visit(expression);
+					if (!this.cannotBeEvaluated)
 					{
-						bool saveCannotBeEvaluated = this.cannotBeEvaluated;
-						this.cannotBeEvaluated = false;
-						base.Visit(expression);
-						if (!this.cannotBeEvaluated)
+						if (this.fnCanBeEvaluated(expression) && !this.candidates.ContainsKey(expression))
 						{
-							if (this.fnCanBeEvaluated(expression) && !this.candidates.ContainsKey(expression))
-							{
-								this.candidates.Add(expression, expression);
-							}
-							else
-							{
-								this.cannotBeEvaluated = true;
-							}
+							this.candidates.Add(expression, expression);
 						}
-						this.cannotBeEvaluated |= saveCannotBeEvaluated;
+						else
+						{
+							this.cannotBeEvaluated = true;
+						}
 					}
-					return expression;
+					this.cannotBeEvaluated |= saveCannotBeEvaluated;
 				}
+				return expression;
 			}
 		}
 	}

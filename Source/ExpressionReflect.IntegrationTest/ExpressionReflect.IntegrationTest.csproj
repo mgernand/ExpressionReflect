@@ -10,7 +10,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>ExpressionReflect.IntegrationTest</RootNamespace>
     <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
-    <AssemblyName>ExpressionReflect.IntegrationTest</AssemblyName>
+    <AssemblyName>ExpressionReflectIntegrationTest</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
     <DebugSymbols>true</DebugSymbols>
