@@ -82,7 +82,7 @@
 					  AssemblyConfiguration="Release"
 					  AssemblyCompany="Matthias Gernand"
 					  AssemblyProduct="$(ProductName)"
-					  AssemblyCopyright="Copyright © Matthias Gernand $(Year)"
+					  AssemblyCopyright="Copyright © Matthias Gernand and Contributors $(Year)"
 					  AssemblyTrademark=""
 					  CLSCompliant="true"
 					  AssemblyVersion="$(Major).$(Minor).$(Build)"
