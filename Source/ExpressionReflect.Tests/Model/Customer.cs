@@ -7,6 +7,16 @@
 	{
 		public const int AgeConstant = 33;
 
+	    public static string StaticField = "StaticField";
+
+	    public static string StaticProperty
+	    {
+	        get
+	        {
+	            return "StaticProperty";
+	        }
+	    }
+
 		private readonly int calculationValue;
 		public string Field;
 

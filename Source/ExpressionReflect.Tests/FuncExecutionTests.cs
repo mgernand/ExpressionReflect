@@ -54,6 +54,42 @@ namespace ExpressionReflect.Tests
 			reflectionResult.Should().Be(emitResult);
 		}
 
+        [Test]
+	    public void ShouldCreateSimpleFunc_StaticPropertyGetter()
+        {
+            //Arrange
+            Expression<Func<string>> expression = () => Customer.StaticProperty;
+
+            //Act
+            Func<string> emit = expression.Compile();
+            Func<string> reflection = expression.Reflect();
+
+            string emitResult = emit.Invoke();
+            string reflectionResult = reflection.Invoke();
+
+            //Assert
+            emitResult.Should().Be("StaticProperty");
+            reflectionResult.Should().Be("StaticProperty");
+        }
+
+        [Test]
+        public void ShouldCreateSimpleFunc_StaticField()
+        {
+            //Arrange
+            Expression<Func<string>> expression = () => Customer.StaticField;
+
+            //Act
+            Func<string> emit = expression.Compile();
+            Func<string> reflection = expression.Reflect();
+
+            string emitResult = emit.Invoke();
+            string reflectionResult = reflection.Invoke();
+
+            //Assert
+            emitResult.Should().Be("StaticField");
+            reflectionResult.Should().Be("StaticField");
+        }
+
 		[Test]
 		public void ShouldCreateSimpleFunc_PropertyGetter_MethodCall()
 		{
