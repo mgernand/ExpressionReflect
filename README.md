@@ -53,6 +53,7 @@ x => x.Firstname.ToLower();
 ```
 
 * Method call with return value
+```csharp
 x => x.CalculateAge()
 ```
 
@@ -192,3 +193,7 @@ Supported features
 * Nested expressions (f.e. LINQ extension methods: `x => x.FirstOrDefault(y.Name == "John")`)
 
 All this features can be combined to more complex expressions.
+
+Contributors
+------------
+
