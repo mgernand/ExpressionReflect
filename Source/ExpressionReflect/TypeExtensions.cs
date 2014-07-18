@@ -11,11 +11,15 @@
 			if(type.IsGenericType)
 			{
 				Type definition = type.GetGenericTypeDefinition();
-				isFunc = definition == typeof(Func<>) ||
-					definition == typeof(Func<,>) ||
-					definition == typeof(Func<,,>) ||
-					definition == typeof(Func<,,,>) ||
-					definition == typeof(Func<,,,,>);
+				isFunc = definition == typeof (Func<>) ||
+				         definition == typeof (Func<,>) ||
+				         definition == typeof (Func<,,>) ||
+				         definition == typeof (Func<,,,>) ||
+				         definition == typeof (Func<,,,,>) ||
+				         definition == typeof (Func<,,,,,>) ||
+				         definition == typeof (Func<,,,,,,>) ||
+				         definition == typeof (Func<,,,,,,,>) ||
+				         definition == typeof (Func<,,,,,,,,>);
 			}
 
 			return isFunc;
@@ -30,10 +34,14 @@
 				Type definition = type.GetGenericTypeDefinition();
 
 				isAction = isAction ||
-					definition == typeof(Action<>) ||
-					definition == typeof(Action<,>) ||
-					definition == typeof(Action<,,>) ||
-					definition == typeof(Action<,,,>);
+				           definition == typeof (Action<>) ||
+				           definition == typeof (Action<,>) ||
+				           definition == typeof (Action<,,>) ||
+				           definition == typeof (Action<,,,>) ||
+				           definition == typeof (Action<,,,,>) ||
+				           definition == typeof (Action<,,,,,>) ||
+				           definition == typeof (Action<,,,,,,>) ||
+				           definition == typeof (Action<,,,,,,,>);
 			}
 
 			return isAction;
