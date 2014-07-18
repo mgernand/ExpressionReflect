@@ -197,3 +197,4 @@ All this features can be combined to more complex expressions.
 Contributors
 ------------
 
+Bernhard Richter (seesharper)
