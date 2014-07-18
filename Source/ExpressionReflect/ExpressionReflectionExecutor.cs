@@ -17,15 +17,12 @@
 		private readonly Stack<LambdaExpression> nestedLambdas = new Stack<LambdaExpression>();
 
 		private readonly Expression targetExpression;
-		private readonly object[] passedArgumentValues;
-		private bool isInitialized = false;
+		private object[] passedArgumentValues;
+		
 
-		public ExpressionReflectionExecutor(Expression targetExpression, object[] passedArgumentValues)
+		public ExpressionReflectionExecutor(Expression targetExpression)
 		{
-			this.targetExpression = targetExpression;
-			this.passedArgumentValues = passedArgumentValues;
-
-			this.Visit(targetExpression);
+			this.targetExpression = targetExpression;						
 		}
 
 		/// <summary>
@@ -33,8 +30,12 @@
 		/// </summary>
 		/// <param name="returnsValue">Flag, indicating if the expression returns a value. The default is <c>true</c>.</param>
 		/// <returns>The result of the expression.</returns>
-		internal object Execute(bool returnsValue = true)
+		internal object Execute(object[] passedArgumentValues, bool returnsValue = true)
 		{
+			this.passedArgumentValues = passedArgumentValues;
+			Initialize();
+			this.Visit(((LambdaExpression)targetExpression).Body);
+
 			if (this.data.Count > 1)
 			{
 				throw new ExpressionExecutionException("The stack contained too much elements.");
@@ -56,15 +57,7 @@
 
 		protected override Expression VisitLambda(LambdaExpression lambda)
 		{
-			Expression expression = null;
-
-			if (!this.isInitialized)
-			{
-				this.Initialize();
-				expression = base.VisitLambda(lambda);
-			}
-			else
-			{
+						
 				Delegate @delegate = null;
 
 				string methodName = null;
@@ -88,18 +81,15 @@
 					throw new ExpressionExecutionException(string.Format("No wrapper method available for delegate type '{0}'", type.Name));
 				}
 
+				var executor = new ExpressionReflectionExecutor(lambda);
+
 				Type[] genericArguments = type.GetGenericArguments();
 				MethodInfo methodInfo = this.FindMethod(methodName, genericArguments);
-				@delegate = Delegate.CreateDelegate(type, this, methodInfo);
+				@delegate = Delegate.CreateDelegate(type, executor, methodInfo);
+				
+				return this.VisitConstant(Expression.Constant(@delegate));
+			
 
-				// Push lambda expression onto the stack. The expression will be used
-				// inside the wrapper method for executing the lambda.
-				this.nestedLambdas.Push(lambda);
-
-				expression = this.VisitConstant(Expression.Constant(@delegate));
-			}
-
-			return expression;
 		}
 
 		protected override Expression VisitParameter(ParameterExpression p)
@@ -562,10 +552,9 @@
 
 		private void Initialize()
 		{
-			this.args = InitializeArgs((LambdaExpression)this.targetExpression, this.passedArgumentValues);
-			this.isInitialized = true;
+			this.args = InitializeArgs((LambdaExpression)this.targetExpression, this.passedArgumentValues);			
 		}
-
+		
 		private static IDictionary<string, object> InitializeArgs(LambdaExpression lambdaExpression, object[] parameterValues)
 		{
 			IDictionary<string, object> arguments = new Dictionary<string, object>();
@@ -652,8 +641,7 @@
 
 		private object ExecuteReflector(params object[] arguments)
 		{
-			LambdaExpression expression = this.nestedLambdas.Peek();
-			object result = expression.Execute(arguments);
+			object result = Execute(arguments);
 			return result;
 		}
 	}

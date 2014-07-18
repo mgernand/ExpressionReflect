@@ -645,6 +645,44 @@ namespace ExpressionReflect.Tests
 			emitResult.Field.Should().Be("SoylentGreen");
 			reflectionResult.Field.Should().Be("SoylentGreen");
 		}
+
+		[Test]
+		public void ShouldCreateSimpleFunc_NestedLambda_WithEnumeration()
+		{
+			//Arrange
+			Expression<Func<string, IEnumerable<char>>> expression = (p) => p.Where((c) => c == 'S').ToList();
+
+			//Act
+			Func<string, IEnumerable<char>> emit = expression.Compile();
+			Func<string, IEnumerable<char>> reflection = expression.Reflect();
+
+			IEnumerable<char> emitResult = emit.Invoke("SomeString");
+			IEnumerable<char> reflectionResult = reflection.Invoke("SomeString");
+
+			// Assert
+			emitResult.Should().ContainInOrder('S', 'S');
+			reflectionResult.Should().ContainInOrder('S', 'S');
+		}
+
+
+		[Test]
+		public void ShouldCreateSimpleFunc_NestedChainedLambda_WithEnumeration()
+		{
+			//Arrange
+			Expression<Func<string, IEnumerable<char>>> expression =
+				(p) => p.Where((c) => c == 'S').Select(c => char.ToLower(c)).ToList();
+
+			//Act
+			Func<string, IEnumerable<char>> emit = expression.Compile();
+			Func<string, IEnumerable<char>> reflection = expression.Reflect();
+
+			IEnumerable<char> emitResult = emit.Invoke("SomeString");
+			IEnumerable<char> reflectionResult = reflection.Invoke("SomeString");
+
+			// Assert
+			emitResult.Should().ContainInOrder('s', 's');
+			reflectionResult.Should().ContainInOrder('s', 's');
+		}
 	}
 }
 
