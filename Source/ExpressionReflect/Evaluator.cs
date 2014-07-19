@@ -8,12 +8,12 @@
 	/// Enables the partial evaluation of queries.
 	/// </summary>
 	/// <remarks>
-	/// From http://msdn.microsoft.com/en-us/library/bb546158.aspx
+	/// From http://blogs.msdn.com/b/mattwar/archive/2007/08/01/linq-building-an-iqueryable-provider-part-iii.aspx
 	/// </remarks>
 	public static class Evaluator
 	{
 		/// <summary>
-		/// Performs evaluation & replacement of independent sub-trees
+		/// Performs evaluation & replacement of independent sub-trees.
 		/// </summary>
 		/// <param name="expression">The root of the expression tree.</param>
 		/// <returns>A new tree with sub-trees evaluated and replaced.</returns>
@@ -23,7 +23,7 @@
 		}
 
 		/// <summary>
-		/// Performs evaluation & replacement of independent sub-trees
+		/// Performs evaluation & replacement of independent sub-trees.
 		/// </summary>
 		/// <param name="expression">The root of the expression tree.</param>
 		/// <param name="fnCanBeEvaluated">A function that decides whether a given expression node can be part of the local function.</param>
@@ -39,7 +39,7 @@
 		}
 
 		/// <summary>
-		/// Evaluates & replaces sub-trees when first candidate is reached (top-down)
+		/// Evaluates & replaces sub-trees when first candidate is reached (top-down).
 		/// </summary>
 		private class SubtreeEvaluator : ExpressionVisitor
 		{
