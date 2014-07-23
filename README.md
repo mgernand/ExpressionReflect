@@ -198,3 +198,6 @@ Contributors
 ------------
 
 Bernhard Richter (seesharper)
+
+
+Thank you!
