@@ -22,8 +22,8 @@
 	</metadata>
 	<files>
 		<!-- Add nuget package files -->
-		<file src="ExpressionReflect.dll" target="lib\portable-win+net45+MonoAndroid16+MonoMac40+MonoTouch40+sl40+wp71\ExpressionReflect.dll" />
-		<file src="ExpressionReflect.xml" target="lib\portable-win+net45+MonoAndroid16+MonoMac40+MonoTouch40+sl40+wp71\ExpressionReflect.xml" />
-		<file src="ExpressionReflect.pdb" target="lib\portable-win+net45+MonoAndroid16+MonoMac40+MonoTouch40+sl40+wp71\ExpressionReflect.pdb" />
+		<file src="ExpressionReflect.dll" target="lib\portable-net45+sl50+win+wpa81+wp80+MonoAndroid10+MonoTouch10\ExpressionReflect.dll" />
+		<file src="ExpressionReflect.xml" target="lib\portable-net45+sl50+win+wpa81+wp80+MonoAndroid10+MonoTouch10\ExpressionReflect.xml" />
+		<file src="ExpressionReflect.pdb" target="lib\portable-net45+sl50+win+wpa81+wp80+MonoAndroid10+MonoTouch10\ExpressionReflect.pdb" />
 	</files>
 </package>
