@@ -3,6 +3,7 @@
 	using System;
 	using System.Collections.Generic;
 	using System.Linq.Expressions;
+	using JetBrains.Annotations;
 
 	/// <summary>
 	/// Enables the partial evaluation of queries.
@@ -13,21 +14,23 @@
 	public static class Evaluator
 	{
 		/// <summary>
-		/// Performs evaluation & replacement of independent sub-trees.
+		/// Performs evaluation and replacement of independent sub-trees.
 		/// </summary>
 		/// <param name="expression">The root of the expression tree.</param>
 		/// <returns>A new tree with sub-trees evaluated and replaced.</returns>
+		[PublicAPI]
 		public static Expression PartialEval(this Expression expression)
 		{
 			return PartialEval(expression, Evaluator.CanBeEvaluatedLocally);
 		}
 
 		/// <summary>
-		/// Performs evaluation & replacement of independent sub-trees.
+		/// Performs evaluation and replacement of independent sub-trees.
 		/// </summary>
 		/// <param name="expression">The root of the expression tree.</param>
 		/// <param name="fnCanBeEvaluated">A function that decides whether a given expression node can be part of the local function.</param>
 		/// <returns>A new tree with sub-trees evaluated and replaced.</returns>
+		[PublicAPI]
 		public static Expression PartialEval(this Expression expression, Func<Expression, bool> fnCanBeEvaluated)
 		{
 			return new SubtreeEvaluator(new Nominator(fnCanBeEvaluated).Nominate(expression)).Eval(expression);
@@ -39,7 +42,7 @@
 		}
 
 		/// <summary>
-		/// Evaluates & replaces sub-trees when first candidate is reached (top-down).
+		/// Evaluates and replaces sub-trees when first candidate is reached (top-down).
 		/// </summary>
 		private class SubtreeEvaluator : ExpressionVisitor
 		{

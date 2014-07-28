@@ -76,43 +76,43 @@ namespace ExpressionReflect.Tests
 			reflectionResult.Should().Be(emitResult);
 		}
 
-        [Test]
-	    public void ShouldExecuteOperator_Equals()
-        {
-            // Arrange
-            Expression<Func<string, bool>> expression = s => s == "SomeValue";
+		[Test]
+		public void ShouldExecuteOperator_Equals()
+		{
+			// Arrange
+			Expression<Func<string, bool>> expression = s => s == "SomeValue";
 
-            // Act
-            Func<string, bool> emit = expression.Compile();
-            Func<string, bool> reflection = expression.Reflect();
+			// Act
+			Func<string, bool> emit = expression.Compile();
+			Func<string, bool> reflection = expression.Reflect();
 
-            bool emitResult = emit.Invoke("SomeValue");
-            bool reflectionResult = reflection.Invoke("SomeValue");
+			bool emitResult = emit.Invoke("SomeValue");
+			bool reflectionResult = reflection.Invoke("SomeValue");
 
-            // Assert
-            emitResult.Should().BeTrue();
-            reflectionResult.Should().BeTrue();
-            reflectionResult.Should().Be(emitResult);
-        }
+			// Assert
+			emitResult.Should().BeTrue();
+			reflectionResult.Should().BeTrue();
+			reflectionResult.Should().Be(emitResult);
+		}
 
-        [Test]
-        public void ShouldExecuteOperator_EqualsWithNullValue()
-        {
-            // Arrange
-            Expression<Func<string, bool>> expression = s => s == null;
+		[Test]
+		public void ShouldExecuteOperator_EqualsWithNullValue()
+		{
+			// Arrange
+			Expression<Func<string, bool>> expression = s => s == null;
 
-            // Act
-            Func<string, bool> emit = expression.Compile();
-            Func<string, bool> reflection = expression.Reflect();
+			// Act
+			Func<string, bool> emit = expression.Compile();
+			Func<string, bool> reflection = expression.Reflect();
 
-            bool emitResult = emit.Invoke(null);
-            bool reflectionResult = reflection.Invoke(null);
+			bool emitResult = emit.Invoke(null);
+			bool reflectionResult = reflection.Invoke(null);
 
-            // Assert
-            emitResult.Should().BeTrue();
-            reflectionResult.Should().BeTrue();
-            reflectionResult.Should().Be(emitResult);
-        }
+			// Assert
+			emitResult.Should().BeTrue();
+			reflectionResult.Should().BeTrue();
+			reflectionResult.Should().Be(emitResult);
+		}
 
 	}
 }

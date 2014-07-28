@@ -6,6 +6,7 @@
 	using System.Linq;
 	using System.Linq.Expressions;
 	using System.Reflection;
+	using JetBrains.Annotations;
 
 	/// <summary>
 	/// An expression visitor that translates the expression tree to reflection calls.
@@ -17,8 +18,6 @@
 		private readonly Stack<LambdaExpression> nestedLambdas = new Stack<LambdaExpression>();
 
 		private readonly Expression targetExpression;
-		private object[] passedArgumentValues;
-		
 
 		public ExpressionReflectionExecutor(Expression targetExpression)
 		{
@@ -28,13 +27,14 @@
 		/// <summary>
 		/// The entry point for the evaluation.
 		/// </summary>
+		/// <param name="passedParameterValues"></param>
 		/// <param name="returnsValue">Flag, indicating if the expression returns a value. The default is <c>true</c>.</param>
 		/// <returns>The result of the expression.</returns>
-		internal object Execute(object[] passedArgumentValues, bool returnsValue = true)
+		internal object Execute(object[] passedParameterValues, bool returnsValue = true)
 		{
-			this.passedArgumentValues = passedArgumentValues;
-			Initialize();
-			this.Visit(((LambdaExpression)targetExpression).Body);
+			this.Initialize(passedParameterValues);
+
+			this.Visit(((LambdaExpression)this.targetExpression).Body);
 
 			if (this.data.Count > 1)
 			{
@@ -57,39 +57,34 @@
 
 		protected override Expression VisitLambda<T>(Expression<T> node)
 		{
-						
-				Delegate @delegate = null;
+			string methodName = null;
 
-				string methodName = null;
+			Type type = node.Type;
+			if (type.IsFunc())
+			{
+				methodName = "Func";
+			}
+			else if (type.IsAction())
+			{
+				methodName = "Action";
+			}
+			else if (type.IsPredicate())
+			{
+				methodName = "Predicate";
+			}
 
-				Type type = node.Type;
-				if (type.IsFunc())
-				{
-					methodName = "Func";
-				}
-				else if (type.IsAction())
-				{
-					methodName = "Action";
-				}
-				else if (type.IsPredicate())
-				{
-					methodName = "Predicate";
-				}
+			if (string.IsNullOrWhiteSpace(methodName))
+			{
+				throw new ExpressionExecutionException(string.Format("No wrapper method available for delegate type '{0}'", type.Name));
+			}
 
-				if (string.IsNullOrWhiteSpace(methodName))
-				{
-					throw new ExpressionExecutionException(string.Format("No wrapper method available for delegate type '{0}'", type.Name));
-				}
+			ExpressionReflectionExecutor executor = new ExpressionReflectionExecutor(node);
 
-				var executor = new ExpressionReflectionExecutor(node);
-
-				Type[] genericArguments = type.GetGenericArguments();
-				MethodInfo methodInfo = this.FindMethod(methodName, genericArguments);
-				@delegate = Delegate.CreateDelegate(type, executor, methodInfo);
+			Type[] genericArguments = type.GetGenericArguments();
+			MethodInfo methodInfo = this.FindMethod(methodName, genericArguments);
+			Delegate @delegate = Delegate.CreateDelegate(type, executor, methodInfo);
 				
-				return this.VisitConstant(Expression.Constant(@delegate));
-			
-
+			return this.VisitConstant(Expression.Constant(@delegate));
 		}
 
 		protected override Expression VisitParameter(ParameterExpression p)
@@ -106,26 +101,28 @@
 		{
 			Expression expression = base.VisitMember(node);
 			MemberInfo memberInfo = node.Member;
-			
-			if (memberInfo is PropertyInfo)
+
+			PropertyInfo propertyInfo = memberInfo as PropertyInfo;
+			if (propertyInfo != null)
 			{
-			    object target = null;
-                if (!((PropertyInfo)memberInfo).GetGetMethod().IsStatic)
-			    {
-			        target = this.GetValueFromStack();
-			    }
-			    PropertyInfo propertyInfo = (PropertyInfo)memberInfo;
+				object target = null;
+				if (!propertyInfo.GetGetMethod().IsStatic)
+				{
+					target = this.GetValueFromStack();
+				}
+
 				object value = propertyInfo.GetValue(target, null);
 				this.data.Push(value);
 			}
-			if(memberInfo is FieldInfo)
+			FieldInfo fieldInfo = memberInfo as FieldInfo;
+			if(fieldInfo != null)
 			{
 				object target = null;
-                if (!((FieldInfo)memberInfo).IsStatic)
+				if (!fieldInfo.IsStatic)
 				{
-                    target = this.GetValueFromStack();    
+					target = this.GetValueFromStack();    
 				}                    
-				FieldInfo fieldInfo = (FieldInfo)memberInfo;
+
 				object value = fieldInfo.GetValue(target);
 				this.data.Push(value);
 			}
@@ -241,7 +238,7 @@
 						value = Convert.ToDouble(values.First()) % Convert.ToDouble(values.Last());
 						break;
 					case ExpressionType.Equal:
-				        value = Equals(values.First(), values.Last());                        
+						value = Equals(values.First(), values.Last());                        
 						break;
 					case ExpressionType.NotEqual:
 						value = !(values.First().Equals(values.Last()));
@@ -437,17 +434,21 @@
 			{
 				MemberBinding binding = init.Bindings[index];
 				MemberInfo memberInfo = binding.Member;
-				if(memberInfo is PropertyInfo)
+
+				PropertyInfo propertyInfo = memberInfo as PropertyInfo;
+				if(propertyInfo != null)
 				{
-					PropertyInfo propertyInfo = (PropertyInfo)memberInfo;
 					object value = values[index];
 					propertyInfo.SetValue(target, value, null);
 				}
-				else if(memberInfo is FieldInfo)
+				else
 				{
-					FieldInfo fieldInfo = (FieldInfo)memberInfo;
-					object value = values[index];
-					fieldInfo.SetValue(target, value);
+					FieldInfo fieldInfo = memberInfo as FieldInfo;
+					if(fieldInfo != null)
+					{
+						object value = values[index];
+						fieldInfo.SetValue(target, value);
+					}
 				}
 			}
 
@@ -515,20 +516,27 @@
 			return parameterValue;
 		}
 
-		private void Initialize()
+		private void Initialize(object[] passedParameterValues)
 		{
-			this.args = InitializeArgs((LambdaExpression)this.targetExpression, this.passedArgumentValues);			
+			this.args = InitializeArgs((LambdaExpression)this.targetExpression, passedParameterValues);			
 		}
 		
-		private static IDictionary<string, object> InitializeArgs(LambdaExpression lambdaExpression, object[] parameterValues)
+		private static IDictionary<string, object> InitializeArgs(LambdaExpression lambdaExpression, object[] passedParameterValues)
 		{
+			int lambdaParamsCount = lambdaExpression.Parameters.Count;
+			int passedParameterValuesCount = passedParameterValues.Length;
+			if (lambdaParamsCount != passedParameterValuesCount)
+			{
+				throw new ExpressionExecutionException("The lambda expression parameter count did not match the passed parameter values count.");
+			}
+
 			IDictionary<string, object> arguments = new Dictionary<string, object>();
 
 			int index = 0;
 			foreach (ParameterExpression parameter in lambdaExpression.Parameters)
 			{
 				string name = parameter.Name;
-				arguments[name] = parameterValues[index++];
+				arguments[name] = passedParameterValues[index++];
 			}
 
 			return arguments;
@@ -554,51 +562,109 @@
 			return result;
 		}
 
+		[UsedImplicitly]
 		private TResult Func<T, TResult>(T arg)
 		{
 			return (TResult)this.ExecuteReflector(arg);
 		}
 
+		[UsedImplicitly]
 		private TResult Func<T1, T2, TResult>(T1 arg1, T2 arg2)
 		{
 			return (TResult)this.ExecuteReflector(arg1, arg2);
 		}
 
+		[UsedImplicitly]
 		private TResult Func<T1, T2, T3, TResult>(T1 arg1, T2 arg2, T3 arg3)
 		{
 			return (TResult)this.ExecuteReflector(arg1, arg2, arg3);
 		}
 
+		[UsedImplicitly]
 		private TResult Func<T1, T2, T3, T4, TResult>(T1 arg1, T2 arg2, T3 arg3, T4 arg4)
 		{
 			return (TResult)this.ExecuteReflector(arg1, arg2, arg3, arg4);
 		}
 
+		[UsedImplicitly]
+		private TResult Func<T1, T2, T3, T4, T5, TResult>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
+		{
+			return (TResult)this.ExecuteReflector(arg1, arg2, arg3, arg4, arg5);
+		}
+
+		[UsedImplicitly]
+		private TResult Func<T1, T2, T3, T4, T5, T6, TResult>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
+		{
+			return (TResult)this.ExecuteReflector(arg1, arg2, arg3, arg4, arg5, arg6);
+		}
+
+		[UsedImplicitly]
+		private TResult Func<T1, T2, T3, T4, T5, T6, T7, TResult>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
+		{
+			return (TResult)this.ExecuteReflector(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+		}
+
+		[UsedImplicitly]
+		private TResult Func<T1, T2, T3, T4, T5, T6, T7, T8, TResult>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8)
+		{
+			return (TResult)this.ExecuteReflector(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+		}
+
+		[UsedImplicitly]
 		private void Action()
 		{
 			this.ExecuteReflector();
 		}
 
+		[UsedImplicitly]
 		private void Action<T>(T arg)
 		{
 			this.ExecuteReflector(arg);
 		}
 
+		[UsedImplicitly]
 		private void Action<T1, T2>(T1 arg1, T2 arg2)
 		{
 			this.ExecuteReflector(arg1, arg2);
 		}
 
+		[UsedImplicitly]
 		private void Action<T1, T2, T3>(T1 arg1, T2 arg2, T3 arg3)
 		{
 			this.ExecuteReflector(arg1, arg2, arg3);
 		}
 
+		[UsedImplicitly]
 		private void Action<T1, T2, T3, T4>(T1 arg1, T2 arg2, T3 arg3, T4 arg4)
 		{
 			this.ExecuteReflector(arg1, arg2, arg3, arg4);
 		}
 
+		[UsedImplicitly]
+		private void Action<T1, T2, T3, T4, T5>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
+		{
+			this.ExecuteReflector(arg1, arg2, arg3, arg4, arg5);
+		}
+
+		[UsedImplicitly]
+		private void Action<T1, T2, T3, T4, T5, T6>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
+		{
+			this.ExecuteReflector(arg1, arg2, arg3, arg4, arg5, arg6);
+		}
+
+		[UsedImplicitly]
+		private void Action<T1, T2, T3, T4, T5, T6, T7>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
+		{
+			this.ExecuteReflector(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+		}
+
+		[UsedImplicitly]
+		private void Action<T1, T2, T3, T4, T5, T6, T7, T8>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8)
+		{
+			this.ExecuteReflector(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+		}
+
+		[UsedImplicitly]
 		private bool Predicate<T>(T arg)
 		{
 			return (bool)this.ExecuteReflector(arg);
@@ -606,7 +672,7 @@
 
 		private object ExecuteReflector(params object[] arguments)
 		{
-			object result = Execute(arguments);
+			object result = this.Execute(arguments);
 			return result;
 		}
 	}
