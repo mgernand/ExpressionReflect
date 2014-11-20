@@ -2,6 +2,9 @@
 namespace ExpressionReflect.Tests
 {
 	using System;
+	using System.Collections;
+	using System.Collections.Generic;
+	using System.Linq;
 	using System.Linq.Expressions;
 	using ExpressionReflect.Tests.Model;
 	using FluentAssertions;
@@ -35,10 +38,10 @@ namespace ExpressionReflect.Tests
 		{
 			// Arrange
 			string str = "test";
-			Expression<Func<Customer, bool>> expresion = x => x.Firstname == str;
+			Expression<Func<Customer, bool>> expression = x => x.Firstname == str;
 
 			// Act
-			string expressionString = expresion.PartialEval().ToString();
+			string expressionString = expression.PartialEval().ToString();
 			Console.WriteLine(expressionString);
 
 			// Assert
@@ -50,10 +53,10 @@ namespace ExpressionReflect.Tests
 		{
 			// Arrange
 			Func<string> func = () => "test";
-			Expression<Func<Customer, bool>> expresion = x => x.Firstname == func();
+			Expression<Func<Customer, bool>> expression = x => x.Firstname == func();
 
 			// Act
-			string expressionString = expresion.PartialEval().ToString();
+			string expressionString = expression.PartialEval().ToString();
 			Console.WriteLine(expressionString);
 
 			// Assert
@@ -65,10 +68,10 @@ namespace ExpressionReflect.Tests
 		{
 			// Arrange
 			Func<int, string> func = x => "test" + x;
-			Expression<Func<Customer, bool>> expresion = x => x.Firstname == func(5);
+			Expression<Func<Customer, bool>> expression = x => x.Firstname == func(5);
 
 			// Act
-			string expressionString = expresion.PartialEval().ToString();
+			string expressionString = expression.PartialEval().ToString();
 			Console.WriteLine(expressionString);
 
 			// Assert
@@ -81,10 +84,10 @@ namespace ExpressionReflect.Tests
 			// Arrange
 			Func<int, string> func = x => "test" + x;
 			int i = 5;
-			Expression<Func<Customer, bool>> expresion = x => x.Firstname == func(i);
+			Expression<Func<Customer, bool>> expression = x => x.Firstname == func(i);
 
 			// Act
-			string expressionString = expresion.PartialEval().ToString();
+			string expressionString = expression.PartialEval().ToString();
 			Console.WriteLine(expressionString);
 
 			// Assert
@@ -97,10 +100,10 @@ namespace ExpressionReflect.Tests
 			// Arrange
 			Func<int, string> func = x => "test" + x;
 			Func<int> i = () => 5;
-			Expression<Func<Customer, bool>> expresion = x => x.Firstname == func(i());
+			Expression<Func<Customer, bool>> expression = x => x.Firstname == func(i());
 
 			// Act
-			string expressionString = expresion.PartialEval().ToString();
+			string expressionString = expression.PartialEval().ToString();
 			Console.WriteLine(expressionString);
 
 			// Assert
@@ -111,10 +114,10 @@ namespace ExpressionReflect.Tests
 		public void ShouldPreEvaluate_InstanceMethodCallWithoutParameter()
 		{
 			// Arrange
-			Expression<Func<Customer, bool>> expresion = x => x.Firstname == this.GetString();
+			Expression<Func<Customer, bool>> expression = x => x.Firstname == this.GetString();
 
 			// Act
-			string expressionString = expresion.PartialEval().ToString();
+			string expressionString = expression.PartialEval().ToString();
 			Console.WriteLine(expressionString);
 
 			// Assert
@@ -125,10 +128,10 @@ namespace ExpressionReflect.Tests
 		public void ShouldPreEvaluate_StaticMethodCallWithoutParameter()
 		{
 			// Arrange
-			Expression<Func<Customer, bool>> expresion = x => x.Firstname == GetStringStatic();
+			Expression<Func<Customer, bool>> expression = x => x.Firstname == GetStringStatic();
 
 			// Act
-			string expressionString = expresion.PartialEval().ToString();
+			string expressionString = expression.PartialEval().ToString();
 			Console.WriteLine(expressionString);
 
 			// Assert
@@ -139,10 +142,10 @@ namespace ExpressionReflect.Tests
 		public void ShouldPreEvaluate_InstanceMethodCallWithConstantParameter()
 		{
 			// Arrange
-			Expression<Func<Customer, bool>> expresion = x => x.Firstname == this.GetString(5);
+			Expression<Func<Customer, bool>> expression = x => x.Firstname == this.GetString(5);
 
 			// Act
-			string expressionString = expresion.PartialEval().ToString();
+			string expressionString = expression.PartialEval().ToString();
 			Console.WriteLine(expressionString);
 
 			// Assert
@@ -153,10 +156,10 @@ namespace ExpressionReflect.Tests
 		public void ShouldPreEvaluate_StaticMethodCallWithConstantParameter()
 		{
 			// Arrange
-			Expression<Func<Customer, bool>> expresion = x => x.Firstname == GetStringStatic(5);
+			Expression<Func<Customer, bool>> expression = x => x.Firstname == GetStringStatic(5);
 
 			// Act
-			string expressionString = expresion.PartialEval().ToString();
+			string expressionString = expression.PartialEval().ToString();
 			Console.WriteLine(expressionString);
 
 			// Assert
@@ -168,10 +171,10 @@ namespace ExpressionReflect.Tests
 		{
 			// Arrange
 			int i = 5;
-			Expression<Func<Customer, bool>> expresion = x => x.Firstname == this.GetString(i);
+			Expression<Func<Customer, bool>> expression = x => x.Firstname == this.GetString(i);
 
 			// Act
-			string expressionString = expresion.PartialEval().ToString();
+			string expressionString = expression.PartialEval().ToString();
 			Console.WriteLine(expressionString);
 
 			// Assert
@@ -183,10 +186,10 @@ namespace ExpressionReflect.Tests
 		{
 			// Arrange
 			int i = 5;
-			Expression<Func<Customer, bool>> expresion = x => x.Firstname == GetStringStatic(i);
+			Expression<Func<Customer, bool>> expression = x => x.Firstname == GetStringStatic(i);
 
 			// Act
-			string expressionString = expresion.PartialEval().ToString();
+			string expressionString = expression.PartialEval().ToString();
 			Console.WriteLine(expressionString);
 
 			// Assert
@@ -198,10 +201,10 @@ namespace ExpressionReflect.Tests
 		{
 			// Arrange
 			Func<int> i = () => 5;
-			Expression<Func<Customer, bool>> expresion = x => x.Firstname == this.GetString(i());
+			Expression<Func<Customer, bool>> expression = x => x.Firstname == this.GetString(i());
 
 			// Act
-			string expressionString = expresion.PartialEval().ToString();
+			string expressionString = expression.PartialEval().ToString();
 			Console.WriteLine(expressionString);
 
 			// Assert
@@ -213,29 +216,46 @@ namespace ExpressionReflect.Tests
 		{
 			// Arrange
 			Func<int> i = () => 5;
-			Expression<Func<Customer, bool>> expresion = x => x.Firstname == GetStringStatic(i());
+			Expression<Func<Customer, bool>> expression = x => x.Firstname == GetStringStatic(i());
 
 			// Act
-			string expressionString = expresion.PartialEval().ToString();
+			string expressionString = expression.PartialEval().ToString();
 			Console.WriteLine(expressionString);
 
 			// Assert
 			expressionString.Should().Be(@"x => (x.Firstname == ""test5"")");
 		}
 
+		//[Test]
+		//public void ShouldPreEvaluate_LocalFuncWithLambdaParameterParameter()
+		//{
+		//	// Arrange
+		//	Func<string, string> func = x => x;
+		//	Expression<Func<Customer, bool>> expression = x => x.Firstname == func(x.Lastname);
+
+		//	// Act
+		//	string expressionString = expression.PartialEval().ToString();
+		//	Console.WriteLine(expressionString);
+
+		//	// Assert
+		//	expressionString.Should().Be(@"x => (x.Firstname == func(x.Lastname))");
+		//}
+
 		[Test]
-		public void ShouldPreEvaluate_LocalFuncWithLambdaParameterParameter()
+		public void ShouldPreEvaluate_LocalCollectionContains()
 		{
 			// Arrange
-			Func<string, string> func = x => x;
-			Expression<Func<Customer, bool>> expresion = x => x.Firstname == func(x.Lastname);
+			var ids = new List<int> { 4, 5, 7 };
+			Expression<Func<Customer, bool>> expression = x => ids.Contains(x.Age);
 
 			// Act
-			string expressionString = expresion.PartialEval().ToString();
+			Expression exp = expression.PartialEval();
+			exp = exp.ExpandCollection();
+			string expressionString = exp.ToString();
 			Console.WriteLine(expressionString);
 
 			// Assert
-			expressionString.Should().Be(@"x => (x.Firstname == func(x.Lastname))");
+			expressionString.Should().Be(@"x => {4|5|7}.Contains(x.Age)");
 		}
 	}
 }

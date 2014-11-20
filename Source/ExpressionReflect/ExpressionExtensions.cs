@@ -10,5 +10,10 @@
 			object result = visitor.Execute(values);
 			return result;
 		}
+
+		public static TResult Execute<TResult>(this Expression expression, params object[] values)
+		{
+			return (TResult)expression.Execute(values);
+		}
 	}
 }
