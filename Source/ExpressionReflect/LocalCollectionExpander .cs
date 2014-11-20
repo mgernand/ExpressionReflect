@@ -5,14 +5,12 @@
 	using System.Collections.Generic;
 	using System.Linq;
 	using System.Linq.Expressions;
-	using JetBrains.Annotations;
 
 	/// <summary>
 	/// See: http://petemontgomery.wordpress.com/2008/08/07/caching-the-results-of-linq-queries/
 	/// </summary>
 	public static class LocalCollectionEvaluator
 	{
-		[PublicAPI]
 		public static Expression ExpandCollection(this Expression expression)
 		{
 			return new LocalCollectionExpander().Visit(expression);
@@ -37,19 +35,19 @@
 				// for any local collection parameters in the method, make a
 				// replacement argument which will print its elements
 				var replacements = (from x in map
-									where x.Param != null && x.Param.IsGenericType
-									let g = x.Param.GetGenericTypeDefinition()
-									where g == typeof(IEnumerable<>) || g == typeof(List<>)
-									where x.Arg.NodeType == ExpressionType.Constant
-									let elementType = x.Param.GetGenericArguments().Single()
-									let printer = MakePrinter((ConstantExpression)x.Arg, elementType)
-									select new { x.Arg, Replacement = printer }).ToList();
+				                    where x.Param != null && x.Param.IsGenericType
+				                    let g = x.Param.GetGenericTypeDefinition()
+				                    where g == typeof(IEnumerable<>) || g == typeof(List<>)
+				                    where x.Arg.NodeType == ExpressionType.Constant
+				                    let elementType = x.Param.GetGenericArguments().Single()
+				                    let printer = MakePrinter((ConstantExpression)x.Arg, elementType)
+				                    select new { x.Arg, Replacement = printer }).ToList();
 
-				if (replacements.Any())
+				if(replacements.Any())
 				{
 					var args = map.Select(x => (from r in replacements
-												where r.Arg == x.Arg
-												select r.Replacement).SingleOrDefault() ?? x.Arg).ToList();
+					                            where r.Arg == x.Arg
+					                            select r.Replacement).SingleOrDefault() ?? x.Arg).ToList();
 
 					node = node.Update(args.First(), args.Skip(1));
 				}

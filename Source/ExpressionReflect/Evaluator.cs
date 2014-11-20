@@ -3,7 +3,6 @@
 	using System;
 	using System.Collections.Generic;
 	using System.Linq.Expressions;
-	using JetBrains.Annotations;
 
 	/// <summary>
 	/// Enables the partial evaluation of queries.
@@ -11,14 +10,13 @@
 	/// <remarks>
 	/// From http://blogs.msdn.com/b/mattwar/archive/2007/08/01/linq-building-an-iqueryable-provider-part-iii.aspx
 	/// </remarks>
-	public static class Evaluator
+	internal static class Evaluator
 	{
 		/// <summary>
 		/// Performs evaluation and replacement of independent sub-trees.
 		/// </summary>
 		/// <param name="expression">The root of the expression tree.</param>
 		/// <returns>A new tree with sub-trees evaluated and replaced.</returns>
-		[PublicAPI]
 		public static Expression PartialEval(this Expression expression)
 		{
 			return PartialEval(expression, Evaluator.CanBeEvaluatedLocally);
@@ -30,7 +28,6 @@
 		/// <param name="expression">The root of the expression tree.</param>
 		/// <param name="fnCanBeEvaluated">A function that decides whether a given expression node can be part of the local function.</param>
 		/// <returns>A new tree with sub-trees evaluated and replaced.</returns>
-		[PublicAPI]
 		public static Expression PartialEval(this Expression expression, Func<Expression, bool> fnCanBeEvaluated)
 		{
 			return new SubtreeEvaluator(new Nominator(fnCanBeEvaluated).Nominate(expression)).Eval(expression);
@@ -60,11 +57,11 @@
 
 			public override Expression Visit(Expression exp)
 			{
-				if (exp == null)
+				if(exp == null)
 				{
 					return null;
 				}
-				if (this.candidates.ContainsKey(exp))
+				if(this.candidates.ContainsKey(exp))
 				{
 					return this.Evaluate(exp);
 				}
@@ -73,11 +70,12 @@
 
 			private Expression Evaluate(Expression e)
 			{
-				if (e.NodeType == ExpressionType.Constant)
+				if(e.NodeType == ExpressionType.Constant)
 				{
 					return e;
 				}
 
+				// Note[mge]: Uses the expression evaluation instead of Expression.Compile().
 				LambdaExpression lambda = Expression.Lambda(e);
 				object value = lambda.Execute();
 				return Expression.Constant(value, e.Type);
@@ -108,14 +106,14 @@
 
 			public override Expression Visit(Expression expression)
 			{
-				if (expression != null)
+				if(expression != null)
 				{
 					bool saveCannotBeEvaluated = this.cannotBeEvaluated;
 					this.cannotBeEvaluated = false;
 					base.Visit(expression);
-					if (!this.cannotBeEvaluated)
+					if(!this.cannotBeEvaluated)
 					{
-						if (this.fnCanBeEvaluated(expression) && !this.candidates.ContainsKey(expression))
+						if(this.fnCanBeEvaluated(expression) && !this.candidates.ContainsKey(expression))
 						{
 							this.candidates.Add(expression, expression);
 						}

@@ -5,10 +5,10 @@ Why?
 ----
 
 Provides the ability to "compile" expressions to delegates without using Reflection.Emit but only using reflection.
-The created delegate will make use of reflection to execute the expression when it is invoked. This is much slower
+The created delegate will make use of reflection to evaluate the expression when it is invoked. This is much slower
 than executing a compiled delegate of an expression!
 
-This framework is intended to be used where dynamic code creation is not possible. The main purpose is the useage with
+This framework is intended to be used where dynamic code creation is not possible. The main purpose is the usage with
 Xamarin.iOS due to it's restriction on Reflection.Emit.
 
 How?

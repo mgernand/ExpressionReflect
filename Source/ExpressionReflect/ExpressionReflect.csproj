@@ -39,9 +39,6 @@
     <DocumentationFile>bin\Release\ExpressionReflect.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
-    <SignAssembly>false</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup>
     <AssemblyOriginatorKeyFile>..\..\ExpressionReflect.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
@@ -58,10 +55,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ExpressionReflectionExecutor.cs" />
     <Compile Include="TypeExtensions.cs" />
-    <Compile Include="Utility.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="JetBrains.Annotations.cs" />
+    <Compile Include="Utilities.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

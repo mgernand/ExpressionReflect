@@ -4,25 +4,25 @@
 	using System.Collections.Generic;
 	using System.Text;
 
-	internal static class Utility
+	internal static class Utilities
 	{
 		public static string ToConcatenatedString<T>(this IEnumerable<T> source, Func<T, string> selector, string separator)
 		{
-			var b = new StringBuilder();
+			StringBuilder sb = new StringBuilder();
 			bool needSeparator = false;
 
-			foreach (var item in source)
+			foreach(T item in source)
 			{
-				if (needSeparator)
+				if(needSeparator)
 				{
-					b.Append(separator);
+					sb.Append(separator);
 				}
 
-				b.Append(selector(item));
+				sb.Append(selector(item));
 				needSeparator = true;
 			}
 
-			return b.ToString();
+			return sb.ToString();
 		}
 
 		public static LinkedList<T> ToLinkedList<T>(this IEnumerable<T> source)
