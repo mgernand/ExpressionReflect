@@ -547,7 +547,7 @@
 		{
 			MethodInfo result = null;
 
-			IEnumerable<MethodInfo> methods = this.GetType().GetMethods(BindingFlags.NonPublic | BindingFlags.Instance).Where(x => x.Name == name);
+			IEnumerable<MethodInfo> methods = this.GetType().GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).Where(x => x.Name == name);
 			foreach(MethodInfo method in methods)
 			{
 				// create the generic method
