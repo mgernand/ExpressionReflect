@@ -562,6 +562,10 @@ namespace ExpressionReflect
 
             return result;
         }
+        public TResult Func<TResult>()
+        {
+            return (TResult)this.ExecuteReflector();
+        }
 
         public TResult Func<T, TResult>(T arg)
         {
