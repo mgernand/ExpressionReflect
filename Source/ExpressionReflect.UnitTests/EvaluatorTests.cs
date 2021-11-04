@@ -1,16 +1,13 @@
-﻿// ReSharper disable InconsistentNaming
-namespace ExpressionReflect.Tests
+﻿namespace ExpressionReflect.UnitTests
 {
-	using System;
-	using System.Collections;
-	using System.Collections.Generic;
-	using System.Linq;
-	using System.Linq.Expressions;
-	using ExpressionReflect.Tests.Model;
-	using FluentAssertions;
-	using NUnit.Framework;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq.Expressions;
+    using ExpressionReflect.Tests.Model;
+    using FluentAssertions;
+    using NUnit.Framework;
 
-	[TestFixture]
+    [TestFixture]
 	public class EvaluatorTests
 	{
 		private string GetString()

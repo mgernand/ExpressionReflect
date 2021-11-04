@@ -1,1 +1,0 @@
-Put your *.nuspec files for Nuget package creation here.

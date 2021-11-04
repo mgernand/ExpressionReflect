@@ -1,1 +1,0 @@
-msbuild Build\Build.proj /target:Setup

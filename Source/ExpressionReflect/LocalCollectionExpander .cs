@@ -19,7 +19,7 @@
 		/// <summary>
 		/// Enables cache key support for local collection values.
 		/// </summary>
-		private class LocalCollectionExpander : ExpressionVisitor
+		private sealed class LocalCollectionExpander : ExpressionVisitor
 		{
 			protected override Expression VisitMethodCall(MethodCallExpression node)
 			{
@@ -71,7 +71,7 @@
 			/// Inherits List in order to support List.Contains instance method as well
 			/// as standard Enumerable.Contains/Any extension methods.
 			/// </remarks>
-			private class Printer<T> : List<T>
+			private sealed class Printer<T> : List<T>
 			{
 				public Printer(IEnumerable collection)
 				{

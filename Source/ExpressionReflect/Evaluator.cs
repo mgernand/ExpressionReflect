@@ -41,7 +41,7 @@
 		/// <summary>
 		/// Evaluates and replaces sub-trees when first candidate is reached (top-down).
 		/// </summary>
-		private class SubtreeEvaluator : ExpressionVisitor
+		private sealed class SubtreeEvaluator : ExpressionVisitor
 		{
 			private readonly IDictionary<Expression, Expression> candidates;
 
@@ -86,7 +86,7 @@
 		/// Performs bottom-up analysis to determine which nodes can possibly
 		/// be part of an evaluated sub-tree.
 		/// </summary>
-		private class Nominator : ExpressionVisitor
+		private sealed class Nominator : ExpressionVisitor
 		{
 			private readonly Func<Expression, bool> fnCanBeEvaluated;
 			private IDictionary<Expression, Expression> candidates;

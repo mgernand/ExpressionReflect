@@ -1,5 +1,4 @@
-﻿// ReSharper disable InconsistentNaming
-namespace ExpressionReflect.Tests
+﻿namespace ExpressionReflect.UnitTests
 {
 	using System;
 	using System.Collections.Generic;

@@ -37,11 +37,11 @@
 
 			if(this.data.Count > 1)
 			{
-				throw new ExpressionExecutionException("The stack contained too much elements.");
+				throw new InvalidOperationException("The stack contained too much elements.");
 			}
 			if(returnsValue && this.data.Count < 1)
 			{
-				throw new ExpressionExecutionException("The stack contained too few elements.");
+				throw new InvalidOperationException("The stack contained too few elements.");
 			}
 
 			object value = null;
@@ -74,7 +74,7 @@
 
 			if(string.IsNullOrWhiteSpace(methodName))
 			{
-				throw new ExpressionExecutionException(string.Format("No wrapper method available for delegate type '{0}'", type.Name));
+				throw new InvalidOperationException($"No wrapper method available for delegate type '{type.Name}'");
 			}
 
 			ExpressionReflectionExecutor executor = new ExpressionReflectionExecutor(node);
@@ -342,7 +342,6 @@
 							result = ~Convert.ToInt64(value);
 						}
 						break;
-				//case ExpressionType.Quote:
 					case ExpressionType.Convert:
 						result = Convert.ChangeType(value, u.Type, CultureInfo.InvariantCulture);
 						break;
@@ -528,7 +527,7 @@
 			int passedParameterValuesCount = passedParameterValues.Length;
 			if(lambdaParamsCount != passedParameterValuesCount)
 			{
-				throw new ExpressionExecutionException("The lambda expression parameter count did not match the passed parameter values count.");
+				throw new InvalidOperationException("The lambda expression parameter count did not match the passed parameter values count.");
 			}
 
 			IDictionary<string, object> arguments = new Dictionary<string, object>();
