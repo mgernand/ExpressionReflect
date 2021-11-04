@@ -5,8 +5,8 @@ Why?
 ----
 
 Provides the ability to "compile" expressions to delegates without using Reflection.Emit but only using reflection.
-The created delegate will make use of reflection to evaluate the expression when it is invoked. This is much slower
-than executing a compiled delegate of an expression!
+The created delegate will make use of reflection to evaluate the expression when it is invoked. This is **very slow**
+when compared to executing a compiled delegate of an expression!
 
 This framework is intended to be used where dynamic code creation is not possible. The main purpose is the usage with
 Xamarin.iOS due to it's restriction on Reflection.Emit.
@@ -197,7 +197,7 @@ All this features can be combined to more complex expressions.
 Contributors
 ------------
 
-Bernhard Richter (seesharper)
+Bernhard Richter [seesharper](https://github.com/seesharper)
 
 
 Thank you!
