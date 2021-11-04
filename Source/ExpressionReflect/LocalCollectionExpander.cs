@@ -9,7 +9,7 @@
 	/// <summary>
 	/// See: http://petemontgomery.wordpress.com/2008/08/07/caching-the-results-of-linq-queries/
 	/// </summary>
-	public static class LocalCollectionEvaluator
+	internal static class LocalCollectionEvaluator
 	{
 		public static Expression ExpandCollection(this Expression expression)
 		{
