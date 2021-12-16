@@ -10,7 +10,9 @@
 	<PropertyGroup>
 		<IncludeSymbols>false</IncludeSymbols>
 		<Copyright>Copyright © 2013-2021 Matthias Gernand. All rights reserved.</Copyright>
-		<Version>2.0.0</Version>
+		<Version>2.0.1</Version>
+		<AssemblyVersion>2.0.1</AssemblyVersion>
+		<FileVersion>2.0.1</FileVersion>
 		<Authors>Matthias Gernand</Authors>
 		<Description>A reflection-based expression evaluator.</Description>
 		<NeutralLanguage>en</NeutralLanguage>
@@ -21,10 +23,15 @@
 		<PackageTags>expressions;reflection;compile;xamarin;ios;maui</PackageTags>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageIcon>icon.png</PackageIcon>
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <None Include="..\..\..\NHibernate.Logging\README.md">
+	  <None Include="..\..\..\Extensions.Logging.Mock\icon.png">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
+	  <None Include="..\..\README.md">
 	    <Pack>True</Pack>
 	    <PackagePath>\</PackagePath>
 	  </None>
