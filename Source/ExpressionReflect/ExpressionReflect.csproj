@@ -5,14 +5,15 @@
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 		<LangVersion>latest</LangVersion>
 		<Nullable>disable</Nullable>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	</PropertyGroup>
 
 	<PropertyGroup>
 		<IncludeSymbols>false</IncludeSymbols>
-		<Copyright>Copyright © 2013-2021 Matthias Gernand. All rights reserved.</Copyright>
-		<Version>2.0.1</Version>
-		<AssemblyVersion>2.0.1</AssemblyVersion>
-		<FileVersion>2.0.1</FileVersion>
+		<Copyright>Copyright © 2013-2022 Matthias Gernand. All rights reserved.</Copyright>
+		<Version>2.0.2</Version>
+		<AssemblyVersion>2.0.2</AssemblyVersion>
+		<FileVersion>2.0.2</FileVersion>
 		<Authors>Matthias Gernand</Authors>
 		<Description>A reflection-based expression evaluator.</Description>
 		<NeutralLanguage>en</NeutralLanguage>
@@ -27,14 +28,14 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <None Include="..\..\..\Extensions.Logging.Mock\icon.png">
-	    <Pack>True</Pack>
-	    <PackagePath>\</PackagePath>
-	  </None>
-	  <None Include="..\..\README.md">
-	    <Pack>True</Pack>
-	    <PackagePath>\</PackagePath>
-	  </None>
+		<None Include="..\..\..\Extensions.Logging.Mock\icon.png">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+		<None Include="..\..\README.md">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
 	</ItemGroup>
 
 </Project>
