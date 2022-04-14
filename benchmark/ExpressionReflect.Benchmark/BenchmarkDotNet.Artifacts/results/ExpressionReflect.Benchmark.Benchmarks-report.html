@@ -2,7 +2,7 @@
 <html lang='en'>
 <head>
 <meta charset='utf-8' />
-<title>ExpressionReflect.Benchmark.Benchmarks-20220412-175130</title>
+<title>ExpressionReflect.Benchmark.Benchmarks-20220413-154030</title>
 
 <style type="text/css">
 	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
@@ -13,20 +13,21 @@
 </head>
 <body>
 <pre><code>
-BenchmarkDotNet=v0.13.1, OS=Windows 10.0.19043.1586 (21H1/May2021Update)
+BenchmarkDotNet=v0.13.1, OS=Windows 10.0.19043.1645 (21H1/May2021Update)
 Intel Core i7-6700K CPU 4.00GHz (Skylake), 1 CPU, 8 logical and 4 physical cores
-.NET SDK=6.0.201
-  [Host]     : .NET 6.0.3 (6.0.322.12309), X64 RyuJIT
-  DefaultJob : .NET 6.0.3 (6.0.322.12309), X64 RyuJIT
+.NET SDK=6.0.202
+  [Host]     : .NET 6.0.4 (6.0.422.16404), X64 RyuJIT
+  DefaultJob : .NET 6.0.4 (6.0.422.16404), X64 RyuJIT
 </code></pre>
 <pre><code></code></pre>
 
 <table>
-<thead><tr><th>                                 Method</th><th>Mean</th><th>Error</th><th>StdDev</th><th>Rank</th><th>Gen 0</th><th>Allocated</th>
+<thead><tr><th>                                 Method</th><th>Mean</th><th>Error</th><th>StdDev</th><th>Median</th><th>Rank</th><th>Gen 0</th><th>Allocated</th>
 </tr>
-</thead><tbody><tr><td>GetPropertyValue_Compile</td><td>1.111 ns</td><td>0.0513 ns</td><td>0.0591 ns</td><td>1</td><td>-</td><td>-</td>
-</tr><tr><td>GetPropertyValue_Compile_PreferInterpretation</td><td>75.320 ns</td><td>1.5276 ns</td><td>2.2864 ns</td><td>2</td><td>0.0362</td><td>152 B</td>
-</tr><tr><td>GetPropertyValue_ExpressionReflect</td><td>281.360 ns</td><td>4.8041 ns</td><td>4.2587 ns</td><td>3</td><td>0.1297</td><td>544 B</td>
+</thead><tbody><tr><td>GetPropertyValue_Compile</td><td>1.275 ns</td><td>0.0249 ns</td><td>0.0220 ns</td><td>1.267 ns</td><td>1</td><td>-</td><td>-</td>
+</tr><tr><td>GetPropertyValue_Compile_PreferInterpretation</td><td>76.937 ns</td><td>1.4026 ns</td><td>3.2227 ns</td><td>75.955 ns</td><td>2</td><td>0.0362</td><td>152 B</td>
+</tr><tr><td>GetPropertyValue_Reflection</td><td>81.173 ns</td><td>1.6533 ns</td><td>3.4143 ns</td><td>79.759 ns</td><td>3</td><td>-</td><td>-</td>
+</tr><tr><td>GetPropertyValue_ExpressionReflect</td><td>278.375 ns</td><td>3.9513 ns</td><td>3.2995 ns</td><td>277.606 ns</td><td>4</td><td>0.1297</td><td>544 B</td>
 </tr></tbody></table>
 </body>
 </html>
