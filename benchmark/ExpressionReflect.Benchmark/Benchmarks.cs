@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ExpressionReflect.Benchmark
+﻿namespace ExpressionReflect.Benchmark
 {
 	using System.Linq.Expressions;
 	using System.Reflection;
