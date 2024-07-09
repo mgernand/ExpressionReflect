@@ -10,10 +10,10 @@
 
 	<PropertyGroup>
 		<IncludeSymbols>false</IncludeSymbols>
-		<Copyright>Copyright © 2013-2023 Matthias Gernand. All rights reserved.</Copyright>
-		<Version>4.1.0</Version>
-		<AssemblyVersion>4.1.0</AssemblyVersion>
-		<FileVersion>4.1.0</FileVersion>
+		<Copyright>Copyright © 2013-2024 Matthias Gernand. All rights reserved.</Copyright>
+		<Version>4.1.1</Version>
+		<AssemblyVersion>4.1.1</AssemblyVersion>
+		<FileVersion>4.1.1</FileVersion>
 		<Authors>Matthias Gernand</Authors>
 		<Description>A reflection-based expression evaluator.</Description>
 		<NeutralLanguage>en</NeutralLanguage>
@@ -39,7 +39,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="JetBrains.Annotations" Version="2023.3.0" />
+		<PackageReference Include="JetBrains.Annotations" Version="2024.2.0" PrivateAssets="All" />
 	</ItemGroup>
 
 </Project>
